@@ -99,3 +99,5 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: ''
+  #repo: git@github.com:softgoto/softgoto.github.io.git
+  #branch: master
