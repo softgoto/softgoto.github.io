@@ -17,4 +17,4 @@ deploy:
   target_branch: master
   on:
     branch: hexo
-  local-dir: public
+  #local-dir: public
