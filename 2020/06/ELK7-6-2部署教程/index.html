@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ELK,Elasticsearch,Logstash,Kibana,Filebeat,Metricbeat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言ELK 到底是什么？下面引用官网的解释。  “ELK”是三个开源项目的首字母缩写，这三个项目分别是：Elasticsearch、Logstash 和 Kibana。Elasticsearch 是一个搜索和分析引擎。Logstash 是服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到诸如 Elasticsearch 等“存储库”中。Kibana 则可以让用户在 Ela">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ELK7.6.2部署教程">
+<meta property="og:url" content="https://softgoto.github.io/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="前言ELK 到底是什么？下面引用官网的解释。  “ELK”是三个开源项目的首字母缩写，这三个项目分别是：Elasticsearch、Logstash 和 Kibana。Elasticsearch 是一个搜索和分析引擎。Logstash 是服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到诸如 Elasticsearch 等“存储库”中。Kibana 则可以让用户在 Ela">
+<meta property="og:image" content="https://i.loli.net/2020/05/06/Z6HVrS89DqPujlE.png">
+<meta property="article:published_time" content="2020-06-10T16:09:34.000Z">
+<meta property="article:modified_time" content="2020-06-10T16:09:34.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="ELK">
+<meta property="article:tag" content="Elasticsearch">
+<meta property="article:tag" content="Logstash">
+<meta property="article:tag" content="Kibana">
+<meta property="article:tag" content="Filebeat">
+<meta property="article:tag" content="Metricbeat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/06/Z6HVrS89DqPujlE.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://softgoto.github.io/2020/06/ELK7-6-2部署教程/"/>
+
+
+
+
+
+  <title>ELK7.6.2部署教程 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">softgoto的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">一位不知名的技术人</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ELK7.6.2部署教程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-10T16:09:34+00:00">
+                2020-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index">
+                    <span itemprop="name">技术类</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>ELK 到底是什么？下面引用官网的解释。</p>
+<blockquote>
+<p>“ELK”是三个开源项目的首字母缩写，这三个项目分别是：Elasticsearch、Logstash 和 Kibana。Elasticsearch 是一个搜索和分析引擎。Logstash 是服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到诸如 Elasticsearch 等“存储库”中。Kibana 则可以让用户在 Elasticsearch 中使用图形和图表对数据进行可视化。</p>
+</blockquote>
+<p>除了 Elasticsearch、Logstash 和 Kibana 之外，我们还需要 Filebeat 和 Metricbeat，这两个组件都属于 Beats 系列中的采集器（Beats 是一些列的轻量级数据采集器）；Filebeat 主要负责采集日志文件，在教程中我们使用它来采集应用系统的日志文件。Metricbeat 主要负责采集指标数据，在教程中我们用它来采集ELKF组件的指标数据来监控各个组件的运行情况。</p>
+<p>本次教程中用到的服务器是 CentOS 7.4，用到的安装包是从 <a href="https://www.elastic.co" target="_blank" rel="noopener">ELK官网地址</a> 找到对应的产品，选择对应的版本下载。</p>
+<p>附上一张 ELK 高可用的架构图，下面我们开始搭建 ELK</p>
+<a id="more"></a>
+
+<p><img src="https://i.loli.net/2020/05/06/Z6HVrS89DqPujlE.png" alt="Snipaste_2020-05-06_13-30-47.png"></p>
+<h3 id="Elasticsearch（单节点模式）"><a href="#Elasticsearch（单节点模式）" class="headerlink" title="Elasticsearch（单节点模式）"></a>Elasticsearch（单节点模式）</h3><h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><p>Elasticsearch 7.x 自带 OpenJDK11，可以指定 Oracle JDK，但版本必须在 1.8 及以上。在配置好 Java 环境之后，启动时会使用系统配置的 Java 环境。在安装 Elasticsearch 时，需要在服务器创建一个新的用户，因为 Elasticsearch 在启动时不支持 root 用户启动。</p>
+<h4 id="解压-amp-配置"><a href="#解压-amp-配置" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>切换到新创建的用户并将安装文件 <code>elasticsearch-7.6.2-linux-x86_64.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf elasticsearch-7.6.2-linux-x86_64.tar.gz</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> elasticsearch-7.6.2/config</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vim elasticsearch.yml</span></span><br></pre></td></tr></table></figure>
+
+<p>找到 <code>node.name: node-1</code> 配置行，删除前面的#号</p>
+<p>找到 <code>network.host: 192.168.0.1</code> 配置行，复制后将配置改成 <code>network.host: 0.0.0.0</code>，<code>0.0.0.0</code> 表示本机 IP。</p>
+<p>在配置文件最后一行添加下面的配置</p>
+<blockquote>
+<p>xpack 是 ELK 的安全认证框架，包括 TLS 通讯加密、创建和管理用户、基于角色的访问控制等功能。原本是付费的功能，但在19年5月 Elastic 官方宣布 6.8.0 和 7.x 版本核心功能免费。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 开启xpack安全认证</span></span><br><span class="line"><span class="attr">xpack.security.enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">xpack.security.transport.ssl.enabled:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 单节点模式</span></span><br><span class="line"><span class="attr">discovery.type:</span> <span class="string">single-node</span></span><br></pre></td></tr></table></figure>
+
+<p>另外，默认的数据存储目录、日志存放目录和服务默认端口配置也说明一下</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数据存储目录，默认在 elasticsearch-7.6.2/data</span></span><br><span class="line"><span class="attr">path.data:</span> <span class="string">/path/to/data</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志存储目录，默认在 elasticsearch-7.6.2/logs</span></span><br><span class="line"><span class="attr">path.logs:</span> <span class="string">/path/to/logs</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务端口，默认 9200</span></span><br><span class="line"><span class="attr">http.port:</span> <span class="number">9200</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="配置优化"><a href="#配置优化" class="headerlink" title="配置优化"></a>配置优化</h4><p>1、根据实际情况调整 JVM 配置</p>
+<p>需要注意的是单节点最大内存配置要小于 <code>32G</code>，合理配置为 <code>31G</code>。ES有个内存指针压缩技术，JVM 小于 <code>32G</code> 才会开启内存压缩，并且 JVM 内存过大会导致重启节点耗费时间太久，JVM 垃圾回收时间过长，容易导致节点脱离集群。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim elasticsearch-7.6.2/config/jvm.options</span></span><br><span class="line"></span><br><span class="line">-Xms12g  # 这里根据自己服务器的内存大小自由发挥</span><br><span class="line">-Xmx12g  # 这里根据自己服务器的内存大小自由发挥</span><br></pre></td></tr></table></figure>
+
+<p>2、修改系统允许的最大文件打开数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 先查看服务器目前的 open files</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">ulimit</span> -a</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改 open files</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo vim /etc/security/limits.conf</span></span><br><span class="line"></span><br><span class="line">*   soft  nofile   20480</span><br><span class="line">*   hard  nofile   20480</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 其中 * 表示所有用户 nofile 表示最大文件句柄数，表示能够打开的最大文件数目</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 后台启动</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./bin/elasticsearch -d</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="初始化密码"><a href="#初始化密码" class="headerlink" title="初始化密码"></a>初始化密码</h4><p>因为前面配置开启了 xpack 功能，所以需要初始化一次密码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./bin/elasticsearch-setup-passwords interactive</span></span><br></pre></td></tr></table></figure>
+
+<p>这里会把 Elasticsearch、Kibana、Logstash 等组件的密码一起设置了，<strong>建议密码配置成同一个</strong></p>
+<h4 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h4><p>打开浏览器访问 <code>http://[你服务器的IP]:9200</code>，会弹出一个输入账号密码的提示框，在账号栏输入 <code>elastic</code> 密码栏输入上一步设置的密码，页面能出现类似下面的 JSON 内容就正常了。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span> : <span class="string">"node-1"</span>,</span><br><span class="line">  <span class="attr">"cluster_name"</span> : <span class="string">"elasticsearch"</span>,</span><br><span class="line">  <span class="attr">"cluster_uuid"</span> : <span class="string">"PDqu_1JrRraoBsMBZ3Kfdw"</span>,</span><br><span class="line">  <span class="attr">"version"</span> : &#123;</span><br><span class="line">    <span class="attr">"number"</span> : <span class="string">"7.6.2"</span>,</span><br><span class="line">    <span class="attr">"build_flavor"</span> : <span class="string">"default"</span>,</span><br><span class="line">    <span class="attr">"build_type"</span> : <span class="string">"tar"</span>,</span><br><span class="line">    <span class="attr">"build_hash"</span> : <span class="string">"ef48eb35cf30adf4db14086e8aabd07ef6fb113f"</span>,</span><br><span class="line">    <span class="attr">"build_date"</span> : <span class="string">"2020-03-26T06:34:37.794943Z"</span>,</span><br><span class="line">    <span class="attr">"build_snapshot"</span> : <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"lucene_version"</span> : <span class="string">"8.4.0"</span>,</span><br><span class="line">    <span class="attr">"minimum_wire_compatibility_version"</span> : <span class="string">"6.8.0"</span>,</span><br><span class="line">    <span class="attr">"minimum_index_compatibility_version"</span> : <span class="string">"6.0.0-beta1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"tagline"</span> : <span class="string">"You Know, for Search"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动常见错误"><a href="#启动常见错误" class="headerlink" title="启动常见错误"></a>启动常见错误</h4><p>1、max file descriptors [4096] for elasticsearch process is too low, increase to at least [65536]</p>
+<p>原因：系统最大文件打开数配置太小<br>解决：编辑 <code>/etc/security/limits.conf</code> 文件（需要 root 权限），增加下面配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*   soft  nofile   65536</span><br><span class="line">*   hard  nofile   65536</span><br></pre></td></tr></table></figure>
+
+<p>2、max number of threads [3818] for user [es] is too low, increase to at least [4096]</p>
+<p>原因：系统最大线程个数配置太小<br>解决：编辑 <code>/etc/security/limits.conf</code> 文件（需要 root 权限），增加下面配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*   soft  nproc   4096</span><br><span class="line">*   hard  nproc   4096</span><br></pre></td></tr></table></figure>
+
+<p>3、max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]</p>
+<p>原因：最大虚拟内存配置太低<br>解决：编辑 <code>/etc/sysctl.conf</code> 文件（需要 root 权限），增加下面配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vm.max_map_count=262144</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行命令使配置生效</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sysctl -p</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h3><p>如果 Logstash 和 Elasticsearch 分别安装在不同的机器，我还是建议使用非 root 用户安装。将安装文件 <code>logstash-7.6.2.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
+<h4 id="解压-amp-配置-1"><a href="#解压-amp-配置-1" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>解压文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf logstash-7.6.2.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> logstash-7.6.2/config/</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>logstash.yml</code> 配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim logstash.yml</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 开启监控设置（后面Metricbeat用到）</span></span><br><span class="line"><span class="attr">http.host:</span> <span class="string">"0.0.0.0"</span></span><br><span class="line"><span class="attr">http.port:</span> <span class="number">9600</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启xpack，配置ES的账号密码，在前面初始化ES密码的时候，有一个logstash_system的用户</span></span><br><span class="line"><span class="attr">xpack.management.elasticsearch.username:</span> <span class="string">logstash_system</span></span><br><span class="line"><span class="attr">xpack.management.elasticsearch.password:</span> <span class="string">ES初始化密码的时候填的密码</span></span><br><span class="line"><span class="attr">xpack.management.elasticsearch.hosts:</span> <span class="string">["https://[ES节点的IP]:9200"]</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>jvm.options</code> 配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim jvm.options</span></span><br><span class="line"></span><br><span class="line">-Xms12g  # 这里根据自己服务器的内存大小自由发挥</span><br><span class="line">-Xmx12g  # 这里根据自己服务器的内存大小自由发挥</span><br></pre></td></tr></table></figure>
+
+<p>复制 <code>logstash-sample.conf</code> 文件，编写过滤规则</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cp logstash-sample.conf logstash-ng-app-log.conf</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vim logstash-ng-app-log.conf</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">########################################################################################################</span></span><br><span class="line"><span class="comment">######                                         配置示例                                            ######</span></span><br><span class="line"><span class="comment">######            Logstash在创建索引时规则是：logstash-%&#123;[fields][appname]&#125;-%&#123;+YYYY.MM.dd&#125;          ######</span></span><br><span class="line"><span class="comment">######                   在采集端Filebeat配置时，需要增加appname字段，与工程名保持相同                ######</span></span><br><span class="line"><span class="comment">######                               比如：nginx、usercenter、marketcenter                         ######</span></span><br><span class="line"><span class="comment">########################################################################################################</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Sample Logstash configuration for creating a simple</span></span><br><span class="line"><span class="comment"># Beats -&gt; Logstash -&gt; Elasticsearch pipeline.</span></span><br><span class="line"></span><br><span class="line"><span class="string">input</span> <span class="string">&#123;</span></span><br><span class="line">  <span class="string">beats</span> <span class="string">&#123;</span></span><br><span class="line">    <span class="string">port</span> <span class="string">=&gt;</span> <span class="number">5044</span></span><br><span class="line">  <span class="string">&#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="string">filter</span> <span class="string">&#123;</span></span><br><span class="line">  <span class="string">if</span> <span class="string">[fields][appname]</span> <span class="string">==</span> <span class="string">"nginx"</span> <span class="string">&#123;</span></span><br><span class="line">    <span class="string">mutate</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="comment"># 替换NG日志中UserAgent中可能出现的中文转义字符（如果不处理 Logstash 解析报错：Unrecognized character escape 'x'）</span></span><br><span class="line">      <span class="string">gsub</span> <span class="string">=&gt;</span> <span class="string">["message",</span> <span class="string">"\\x"</span><span class="string">,</span> <span class="string">"\\\x"</span><span class="string">]</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">    <span class="string">json</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="string">source</span> <span class="string">=&gt;</span> <span class="string">"message"</span></span><br><span class="line">      <span class="comment"># target =&gt; "doc"</span></span><br><span class="line">      <span class="comment"># remove_field =&gt; ["message"]</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">    <span class="string">geoip</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="string">source</span> <span class="string">=&gt;</span> <span class="string">"remote_addr"</span></span><br><span class="line">      <span class="string">target</span> <span class="string">=&gt;</span> <span class="string">"geoip"</span></span><br><span class="line">      <span class="comment"># 使用 GeoLite2-City 库解析IP，将 IP 转换成城市名。库从这里下载 https://dev.maxmind.com/geoip/geoip2/geolite2/</span></span><br><span class="line">      <span class="comment"># 下载后上传到服务器，在下面配置指向数据库文件就可以了</span></span><br><span class="line">      <span class="string">database</span> <span class="string">=&gt;</span> <span class="string">"/home/user/logstash-7.2.6/geolite2db/GeoLite2-City.mmdb"</span></span><br><span class="line">      <span class="string">add_field</span> <span class="string">=&gt;</span> <span class="string">[</span> <span class="string">"[geoip][coordinates]"</span><span class="string">,</span> <span class="string">"<span class="template-variable">%&#123;[geoip][longitude]&#125;</span>"</span> <span class="string">]</span></span><br><span class="line">      <span class="string">add_field</span> <span class="string">=&gt;</span> <span class="string">[</span> <span class="string">"[geoip][coordinates]"</span><span class="string">,</span> <span class="string">"<span class="template-variable">%&#123;[geoip][latitude]&#125;</span>"</span> <span class="string">]</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">  <span class="string">&#125;else&#123;</span></span><br><span class="line">    <span class="string">grok</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="comment"># 匹配日志时间</span></span><br><span class="line">      <span class="string">match</span> <span class="string">=&gt;</span> <span class="string">&#123;"message"</span> <span class="string">=&gt;</span> <span class="string">"(?&lt;timestamp&gt;^([0-9]+-[0-9]+-[0-9]+\s[0-9]+:[0-9]+:[0-9]+,[0-9]+))"</span><span class="string">&#125;</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">    <span class="string">grok</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="comment"># 匹配日志级别，输出到 level 字段</span></span><br><span class="line">      <span class="string">match</span> <span class="string">=&gt;</span> <span class="string">&#123;"message"</span> <span class="string">=&gt;</span> <span class="string">"<span class="template-variable">%&#123;LOGLEVEL:level&#125;</span>"</span><span class="string">&#125;</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">    <span class="string">date</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="comment"># 将上面日志时间格式之后覆盖到 @timestamp</span></span><br><span class="line">      <span class="string">match</span> <span class="string">=&gt;</span> <span class="string">["timestamp",</span> <span class="string">"yyyy-MM-dd HH:mm:ss,SSS"</span><span class="string">]</span></span><br><span class="line">      <span class="string">target</span> <span class="string">=&gt;</span> <span class="string">"@timestamp"</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">    <span class="string">mutate</span> <span class="string">&#123;</span></span><br><span class="line">      <span class="string">remove_field</span> <span class="string">=&gt;</span> <span class="string">["timestamp"]</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line">  <span class="string">&#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="string">output</span> <span class="string">&#123;</span></span><br><span class="line">  <span class="string">elasticsearch</span> <span class="string">&#123;</span></span><br><span class="line">    <span class="string">hosts</span> <span class="string">=&gt;</span> <span class="string">["http://youer-es-ip:9200"]</span></span><br><span class="line">    <span class="string">index</span> <span class="string">=&gt;</span> <span class="string">"logstash-<span class="template-variable">%&#123;[fields][appname]&#125;</span>-<span class="template-variable">%&#123;+YYYY.MM.dd&#125;</span>"</span></span><br><span class="line">    <span class="string">user</span> <span class="string">=&gt;</span> <span class="string">"elastic"</span></span><br><span class="line">    <span class="string">password</span> <span class="string">=&gt;</span> <span class="string">"******"</span> <span class="comment"># 前面自己配置的密码</span></span><br><span class="line">  <span class="string">&#125;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-1"><a href="#启动-1" class="headerlink" title="启动"></a>启动</h4><p>1、先检查配置文件编写是否正确</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./bin/logstash -t -f config/logstash-ng-app-log.conf</span></span><br></pre></td></tr></table></figure>
+
+<p>看到 <code>Using config.test_and_exit mode. Config Validation Result: OK. Exiting Logstash</code> 表示配置文件正常</p>
+<p>2、后台启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> nohup ./bin/logstash -f config/logstash-ng-app-log.conf &amp;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 或者这样（动态配置加载模式，配置文件如果有变化会自动重新加载）</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> nohup ./bin/logstash -f config/logstash-ng-app-log.conf --config.reload.automatic &amp;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Kibana"><a href="#Kibana" class="headerlink" title="Kibana"></a>Kibana</h3><p>如果 Kibana 和上面其他组件分别安装在不同的机器，我还是建议使用非 root 用户安装。将安装文件 <code>kibana-7.6.2-linux-x86_64.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
+<h4 id="解压-amp-配置-2"><a href="#解压-amp-配置-2" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>解压文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf kibana-7.6.2-linux-x86_64.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> kibana-7.6.2-linux-x86_64</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>kibana.yml</code> 配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim config/kibana.yml</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 服务端口</span></span><br><span class="line"><span class="attr">server.port:</span> <span class="number">5601</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 本机IP</span></span><br><span class="line"><span class="attr">server.host:</span> <span class="string">"192.168.100.190"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ES 服务地址</span></span><br><span class="line"><span class="attr">elasticsearch.hosts:</span> <span class="string">["http://192.168.100.192:9200"]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 账号密码，前面在安装ES时生成的密码</span></span><br><span class="line"><span class="attr">elasticsearch.username:</span> <span class="string">"kibana"</span></span><br><span class="line"><span class="attr">elasticsearch.password:</span> <span class="string">"********"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 语言: 默认英文 en 中文 zh-CN</span></span><br><span class="line"><span class="attr">i18n.locale:</span> <span class="string">"zh-CN"</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-2"><a href="#启动-2" class="headerlink" title="启动"></a>启动</h4><p>后台启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> nohup ./bin/kibana &amp;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Filebeat"><a href="#Filebeat" class="headerlink" title="Filebeat"></a>Filebeat</h3><p>将安装文件 <code>filebeat-7.6.2-linux-x86_64.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
+<h4 id="解压-amp-配置-3"><a href="#解压-amp-配置-3" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>解压文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf filebeat-7.6.2-linux-x86_64.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> filebeat-7.6.2-linux-x86_64</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>filebeat.yml</code> 配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim filebeat.yml</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat.inputs:</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> <span class="attr">type:</span> <span class="string">log</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">paths:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/data/logs/mop-prd-user/*.log</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">fields:</span></span><br><span class="line">    <span class="attr">appname:</span> <span class="string">usercenter</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 多行合并</span></span><br><span class="line">  <span class="attr">multiline.pattern:</span> <span class="string">'^\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;'</span></span><br><span class="line">  <span class="attr">multiline.negate:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">multiline.match:</span> <span class="string">after</span></span><br><span class="line"></span><br><span class="line"><span class="attr">filebeat.config.modules:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">$&#123;path.config&#125;/modules.d/*.yml</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">reload.enabled:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">setup.template.settings:</span></span><br><span class="line">  <span class="attr">index.number_of_shards:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">setup.kibana:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">output.logstash:</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">["Logstash的IP:5044"]</span></span><br><span class="line"></span><br><span class="line"><span class="attr">processors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_host_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_cloud_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_docker_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_kubernetes_metadata:</span> <span class="string">~</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启http endpoint</span></span><br><span class="line"><span class="attr">http.enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">http.host:</span> <span class="string">本机IP</span></span><br><span class="line"><span class="attr">http.port:</span> <span class="number">5066</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-3"><a href="#启动-3" class="headerlink" title="启动"></a>启动</h4><p>后台启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> nohup ./filebeat -e -c filebeat.yml -d <span class="string">"publish"</span> &amp;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Metricbeat"><a href="#Metricbeat" class="headerlink" title="Metricbeat"></a>Metricbeat</h3><p>将安装文件 <code>filebeat-7.6.2-linux-x86_64.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
+<h4 id="解压-amp-配置-4"><a href="#解压-amp-配置-4" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>解压文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf metricbeat-7.6.2-linux-x86_64.tar.gz</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> metricbeat-7.6.2-linux-x86_64</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>metricbeat.yml</code> 配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim metricbeat.yml</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">metricbeat.config.modules:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">$&#123;path.config&#125;/modules.d/*.yml</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">reload.enabled:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">setup.template.settings:</span></span><br><span class="line">  <span class="attr">index.number_of_shards:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">index.codec:</span> <span class="string">best_compression</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">setup.kibana:</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">output.elasticsearch:</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">["192.168.100.192:9200"]</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># 前面配置的账号密码</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">"elastic"</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">"********"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">processors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_host_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_cloud_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_docker_metadata:</span> <span class="string">~</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">add_kubernetes_metadata:</span> <span class="string">~</span></span><br></pre></td></tr></table></figure>
+
+<p>启用要采集的组件模块</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果ELK开启了xpack，则这里就需要带xpack</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./metricbeat modules <span class="built_in">enable</span> kibana-xpack elasticsearch-xpack logstash-xpack beat-xpack</span></span><br></pre></td></tr></table></figure>
+
+<p>禁用模块</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./metricbeat modules <span class="built_in">disable</span> system</span></span><br></pre></td></tr></table></figure>
+
+<p>初始化索引模板和dashboards（可选）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./metricbeat setup</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="启动-4"><a href="#启动-4" class="headerlink" title="启动"></a>启动</h4><p>后台启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> nohup ./metricbeat -e &amp;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>Done.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
+          
+            <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+          
+            <a href="/tags/Logstash/" rel="tag"># Logstash</a>
+          
+            <a href="/tags/Kibana/" rel="tag"># Kibana</a>
+          
+            <a href="/tags/Filebeat/" rel="tag"># Filebeat</a>
+          
+            <a href="/tags/Metricbeat/" rel="tag"># Metricbeat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/header.jpg"
+                alt="softgoto" />
+            
+              <p class="site-author-name" itemprop="name">softgoto</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/softgoto" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Elasticsearch（单节点模式）"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch（单节点模式）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#准备工作"><span class="nav-number">2.1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-amp-配置"><span class="nav-number">2.2.</span> <span class="nav-text">解压&amp;配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置优化"><span class="nav-number">2.3.</span> <span class="nav-text">配置优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动"><span class="nav-number">2.4.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化密码"><span class="nav-number">2.5.</span> <span class="nav-text">初始化密码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#验证"><span class="nav-number">2.6.</span> <span class="nav-text">验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动常见错误"><span class="nav-number">2.7.</span> <span class="nav-text">启动常见错误</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logstash"><span class="nav-number">3.</span> <span class="nav-text">Logstash</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-amp-配置-1"><span class="nav-number">3.1.</span> <span class="nav-text">解压&amp;配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-1"><span class="nav-number">3.2.</span> <span class="nav-text">启动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kibana"><span class="nav-number">4.</span> <span class="nav-text">Kibana</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-amp-配置-2"><span class="nav-number">4.1.</span> <span class="nav-text">解压&amp;配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-2"><span class="nav-number">4.2.</span> <span class="nav-text">启动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Filebeat"><span class="nav-number">5.</span> <span class="nav-text">Filebeat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-amp-配置-3"><span class="nav-number">5.1.</span> <span class="nav-text">解压&amp;配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-3"><span class="nav-number">5.2.</span> <span class="nav-text">启动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Metricbeat"><span class="nav-number">6.</span> <span class="nav-text">Metricbeat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-amp-配置-4"><span class="nav-number">6.1.</span> <span class="nav-text">解压&amp;配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-4"><span class="nav-number">6.2.</span> <span class="nav-text">启动</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
