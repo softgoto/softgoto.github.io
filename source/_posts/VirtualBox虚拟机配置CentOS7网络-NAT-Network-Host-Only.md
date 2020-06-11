@@ -1,6 +1,7 @@
 ---
 title: VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)
 date: 2018-09-21 19:32:57
+updated: 2020-06-10 17:21:12
 categories: 技术类
 tags:
 - VirtualBox

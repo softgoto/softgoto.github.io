@@ -101,3 +101,10 @@ deploy:
   type: ''
   #repo: git@github.com:softgoto/softgoto.github.io.git
   #branch: master
+
+# Emoji
+emoji:
+  enable: true
+  className: github-emoji
+  styles:
+  customEmojis:
