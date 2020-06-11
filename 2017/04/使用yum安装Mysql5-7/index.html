@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记一下使用 yum 安装 mysql 的过程，环境：CentOS 7.2、MySQL5.7 配置 yum 源在 MySQL 官网中下载 yum 源 RPM 安装包：https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用yum安装Mysql5.7">
+<meta property="og:url" content="https://softgoto.github.io/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="记一下使用 yum 安装 mysql 的过程，环境：CentOS 7.2、MySQL5.7 配置 yum 源在 MySQL 官网中下载 yum 源 RPM 安装包：https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg">
+<meta property="article:published_time" content="2017-04-08T18:28:39.000Z">
+<meta property="article:modified_time" content="2017-04-08T18:28:39.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg">
+
+<link rel="canonical" href="https://softgoto.github.io/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用yum安装Mysql5.7 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用yum安装Mysql5.7
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-04-08 18:28:39" itemprop="dateCreated datePublished" datetime="2017-04-08T18:28:39+00:00">2017-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>记一下使用 yum 安装 mysql 的过程，环境：CentOS 7.2、MySQL5.7</p>
+<h3 id="配置-yum-源"><a href="#配置-yum-源" class="headerlink" title="配置 yum 源"></a>配置 yum 源</h3><p>在 MySQL 官网中下载 yum 源 RPM 安装包：<a href="https://dev.mysql.com/downloads/repo/yum/" target="_blank" rel="noopener">https://dev.mysql.com/downloads/repo/yum/</a></p>
+<a id="more"></a>
+
+<p><img src="https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg" alt="006tKfTcgy1fee6zaqdyjj317z0b3tbh.jpg"></p>
+<p>将 MySQL RPM 源的安装包下载到服务器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm</span></span><br></pre></td></tr></table></figure>
+
+<p>安装 MySQL 源</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum localinstall mysql57-community-release-el7-8.noarch.rpm</span></span><br></pre></td></tr></table></figure>
+
+<p>检查一下 MySQL 源有没有安装成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum repolist enabled | grep "mysql.*-community.*"</span><br></pre></td></tr></table></figure>
+
+<p>看到图这样就表示安装成功了</p>
+<p><img src="https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg" alt="006tKfTcgy1fee6zwdrbwj30ir02n3z6.jpg"></p>
+<p>当然也可以选择 MySQL 版本来安装，编辑一下 MySQL RPM 源文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim /etc/yum.repos.d/mysql-community.repo</span></span><br></pre></td></tr></table></figure>
+
+<p>比如要安装 5.6 版本，将 5.7 源的 <code>enabled=1</code> 改成 <code>enabled=0</code>，然后再将 5.6 源的 <code>enabled=0</code> 改成 <code>enabled=1</code> 就可以了，改完之后的效果如下所示： </p>
+<p><img src="https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg" alt="006tKfTcgy1fee709xjjtj31kw0qt45k.jpg"></p>
+<h3 id="安装-MySQL"><a href="#安装-MySQL" class="headerlink" title="安装 MySQL"></a>安装 MySQL</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum install mysql-community-server</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="启动-MySQL-服务"><a href="#启动-MySQL-服务" class="headerlink" title="启动 MySQL 服务"></a>启动 MySQL 服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl start mysqld</span></span><br></pre></td></tr></table></figure>
+
+<p>查看 MySQL 的启动状态</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl status mysqld</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配置开机启动"><a href="#配置开机启动" class="headerlink" title="配置开机启动"></a>配置开机启动</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl <span class="built_in">enable</span> mysqld</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> systemctl daemon-reload</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MySQL-配置"><a href="#MySQL-配置" class="headerlink" title="MySQL 配置"></a>MySQL 配置</h3><p>安装完成之后，在 <code>/var/log/mysqld.log</code> 文件中给 MySQL root 用户生成了一个默认密码，通过下面的方式找到 root 默认密码，然后登录 MySQL 就能修改 root 密码了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> grep <span class="string">'temporary password'</span> /var/<span class="built_in">log</span>/mysqld.log</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg" alt="006tKfTcgy1fee70irrwvj30n701k0t4.jpg"></p>
+<p>登录 MySQL</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mysql -uroot -p</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 root 用户密码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED BY <span class="string">'密码'</span>;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 或者</span></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> <span class="built_in">set</span> password <span class="keyword">for</span> <span class="string">'root'</span>@<span class="string">'localhost'</span>=password(<span class="string">'密码'</span>);</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>MySQL 5.7 默认安装了密码安全检查插件（validate_password），默认密码检查策略要求密码必须包含：大小写字母、数字和特殊符号，并且长度不能少于 8 位。否则会提示 ERROR 1819 (HY000): Your password does not satisfy the current policy requirements 错误，如下图所示： </p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg" alt="006tKfTcgy1fee711wtn4j30ig01h3yp.jpg"></p>
+<p>我们可以通过 MySQL 环境变量查看密码策略的相关信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> show variables like <span class="string">'%password%'</span>;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg" alt="006tKfTcgy1fee71avgi3j30dg0a8ta6.jpg"></p>
+<p>validate_password_policy：密码策略，默认为MEDIUM策略<br>validate_password_dictionary_file：密码策略文件，策略为STRONG才需要<br>validate_password_length：密码最少长度<br>validate_password_mixed_case_count：大小写字符长度，至少1个<br>validate_password_number_count ：数字至少1个<br>validate_password_special_char_count：特殊字符至少1个 </p>
+<p>上述参数是默认策略 MEDIUM 的密码检查规则，共有以下几种密码策略：</p>
+<table>
+<thead>
+<tr>
+<th align="center">策略</th>
+<th align="center">检查规则</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0 or LOW</td>
+<td align="center">Length</td>
+</tr>
+<tr>
+<td align="center">1 or MEDIUM</td>
+<td align="center">Length; numeric, lowercase/uppercase, and special characters</td>
+</tr>
+<tr>
+<td align="center">2 or STRONG</td>
+<td align="center">Length; numeric, lowercase/uppercase, and special characters; dictionary file</td>
+</tr>
+</tbody></table>
+<p>这里是 MySQL 官方对密码策略的详细说明：<a href="http://dev.mysql.com/doc/refman/5.7/en/validate-password-options-variables.html#sysvar_validate_password_policy" target="_blank" rel="noopener">点我</a></p>
+<p>如果需要修改密码安全策略，需要在 <code>/etc/my.cnf</code> 文件添加 <code>validate_password_policy</code> 配置，配置分三种，0（LOW）、1（MEDIUM）、2（STRONG），如果选择 2 需要提供密码字典文件。如果不需要密码策略可以把 <code>validate_password</code> 配置成 <code>off</code>，当然我不建议这样做 <span class="github-emoji" alias="underage" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f51e.png?v8">&#x1f51e;</span>。配置好后需要重启 MySQL 服务使配置生效。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart mysqld</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加远程登录用户"><a href="#添加远程登录用户" class="headerlink" title="添加远程登录用户"></a>添加远程登录用户</h3><p>默认只允许 root 帐户在本地登录，如果要在其它机器上连接 MySQL，必须修改 root 允许远程连接，或者添加一个允许远程连接的帐户，为了安全起见，我添加一个新的帐户：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> GRANT ALL PRIVILEGES ON *.* TO <span class="string">'newuser'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'newuserpassword'</span> WITH GRANT OPTION;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="修改字符集"><a href="#修改字符集" class="headerlink" title="修改字符集"></a>修改字符集</h3><p>将 MySQL 字符集改为 <code>utf8</code> 或者 <code>utf8mb4</code>，需要修改 <code>/etc/my.cnf</code> 配置文件，在 <code>[mysqld]</code> 下添加编码配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">character_set_server&#x3D;utf8</span><br><span class="line">init_connect&#x3D;&#39;SET NAMES utf8&#39;</span><br></pre></td></tr></table></figure>
+
+<p>重新启动 MySQL 服务，检查一下数据库默认编码有没有修改成功</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> show variables like <span class="string">'%character%'</span>;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg" alt="006tKfTcgy1fee71fclrzj30dr07it9n.jpg"></p>
+<h3 id="修改用户密码过期规则"><a href="#修改用户密码过期规则" class="headerlink" title="修改用户密码过期规则"></a>修改用户密码过期规则</h3><p>默认情况下密码超过 90 天就会提示要更换，当然我们可以设置密码过期规则</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> PASSWORD EXPIRE NEVER;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> PASSWORD EXPIRE INTERVAL 30 DAY;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>Done. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" rel="prev" title="如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins">
+      <i class="fa fa-chevron-left"></i> 如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="next" title="VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)">
+      VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-yum-源"><span class="nav-number">1.</span> <span class="nav-text">配置 yum 源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-MySQL"><span class="nav-number">2.</span> <span class="nav-text">安装 MySQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-MySQL-服务"><span class="nav-number">3.</span> <span class="nav-text">启动 MySQL 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置开机启动"><span class="nav-number">4.</span> <span class="nav-text">配置开机启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL-配置"><span class="nav-number">5.</span> <span class="nav-text">MySQL 配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加远程登录用户"><span class="nav-number">6.</span> <span class="nav-text">添加远程登录用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改字符集"><span class="nav-number">7.</span> <span class="nav-text">修改字符集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改用户密码过期规则"><span class="nav-number">8.</span> <span class="nav-text">修改用户密码过期规则</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

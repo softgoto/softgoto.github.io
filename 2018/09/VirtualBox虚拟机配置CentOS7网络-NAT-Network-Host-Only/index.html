@@ -14,10 +14,11 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。 先介绍一下环境宿主机：macOS High Sierra 10.13.6虚拟机工具：Oracle VM VirtualBox 5.2.18虚拟机系统：CentOS 7 创建虚拟机VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox">
@@ -55,7 +56,7 @@
 <meta property="og:image" content="https://i.loli.net/2020/06/11/9vywAF2tsCapDSI.png">
 <meta property="og:image" content="https://i.loli.net/2020/06/11/I5v9w7groV1aUMW.png">
 <meta property="article:published_time" content="2018-09-21T19:32:57.000Z">
-<meta property="article:modified_time" content="2018-09-21T19:32:57.000Z">
+<meta property="article:modified_time" content="2020-06-10T17:21:12.000Z">
 <meta property="article:author" content="softgoto">
 <meta property="article:tag" content="VirtualBox">
 <meta property="article:tag" content="虚拟机">
@@ -221,6 +222,13 @@
 
               <time title="创建时间：2018-09-21 19:32:57" itemprop="dateCreated datePublished" datetime="2018-09-21T19:32:57+00:00">2018-09-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-10 17:21:12" itemprop="dateModified" datetime="2020-06-10T17:21:12+00:00">2020-06-10</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -232,6 +240,13 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
 
         </div>
       </header>
@@ -339,7 +354,7 @@
 </blockquote>
 <h2 id="多台虚拟机内网互通"><a href="#多台虚拟机内网互通" class="headerlink" title="多台虚拟机内网互通"></a>多台虚拟机内网互通</h2><p>完成上面的配置后，一台机器的网络配置就完成了，剩下的两台按照上面的步骤虚拟机访问外网、宿主机访问虚拟机就可以了，这里要注意，全局添加的 <code>NAT Network网卡</code> 和 <code>Host-Only网卡</code> 不用重复添加，多台虚拟机可以公用</p>
 <p>多台机器配置完成后，内网就是互通的，一般默认情况下，<code>NAT Network网卡</code> 使用的是 <code>10.0.2</code> 网段</p>
-<p>Dnoe. :coffee:</p>
+<p>Dnoe. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
 
     </div>
 
@@ -359,8 +374,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" rel="prev" title="如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins">
-      <i class="fa fa-chevron-left"></i> 如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins
+    <a href="/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/" rel="prev" title="使用yum安装Mysql5.7">
+      <i class="fa fa-chevron-left"></i> 使用yum安装Mysql5.7
     </a></div>
       <div class="post-nav-item">
     <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" rel="next" title="ELK7.6.2部署教程">
@@ -440,7 +455,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -453,7 +468,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -491,10 +506,13 @@
   </span>
   <span class="author" itemprop="copyrightHolder">softgoto</span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
 
 
 
@@ -509,6 +527,8 @@
 
   
   <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
   <script src="/lib/velocity/velocity.min.js"></script>
   <script src="/lib/velocity/velocity.ui.min.js"></script>
 
@@ -517,7 +537,7 @@
 <script src="/js/motion.js"></script>
 
 
-<script src="/js/schemes/muse.js"></script>
+<script src="/js/schemes/pisces.js"></script>
 
 
 <script src="/js/next-boot.js"></script>
