@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。 先介绍一下环境宿主机：macOS High Sierra 10.13.6虚拟机工具：Oracle VM VirtualBox 5.2.18虚拟机系统：CentOS 7 创建虚拟机VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)">
+<meta property="og:url" content="https://softgoto.github.io/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。 先介绍一下环境宿主机：macOS High Sierra 10.13.6虚拟机工具：Oracle VM VirtualBox 5.2.18虚拟机系统：CentOS 7 创建虚拟机VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/7nDRSFrNgqsoLcz.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/VYwIcZOeiUWKqTN.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/ZDlOmA5zX3hdFUS.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/nO62zUSCY3uLsRK.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/vztqn8mxrDUH6ky.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/gYUJ62fWDN4Qlk5.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/19XzJcGgNlyKe2A.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/p78Tdat5Z4RufMv.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/YtsNTiG76anvQzc.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/zjZKhGTCoLyvDOa.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/Vo5ibHexXM1wnTm.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/pjnGFCsq5DScvtM.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/Uh3SvMmkRgPwf2T.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/dUazKSeETX2W4Jl.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/DbhgJi9ZsWjL5Up.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/naJsmzoR7dNkqQL.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/3stIY81HAlFbBf7.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/ZNxuUA3n6OFMR2p.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/YNP1UGa8msryzek.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/cqTdsxJmpvR6a9W.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/y3SudZ6Re1vLEiJ.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/YTL8rphqxeAtMNV.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/W7k4eCqR32zPmxF.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/hezrgJHqdL6MNFP.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/3PaHRJVMBTkpb2L.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/9vywAF2tsCapDSI.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/11/I5v9w7groV1aUMW.png">
+<meta property="article:published_time" content="2018-09-21T19:32:57.000Z">
+<meta property="article:modified_time" content="2018-09-21T19:32:57.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="VirtualBox">
+<meta property="article:tag" content="虚拟机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/06/11/7nDRSFrNgqsoLcz.png">
+
+<link rel="canonical" href="https://softgoto.github.io/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only) | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-09-21 19:32:57" itemprop="dateCreated datePublished" datetime="2018-09-21T19:32:57+00:00">2018-09-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。</p>
+<p>先介绍一下环境<br>宿主机：<code>macOS High Sierra 10.13.6</code><br>虚拟机工具：<code>Oracle VM VirtualBox 5.2.18</code><br>虚拟机系统：<code>CentOS 7</code></p>
+<h2 id="创建虚拟机"><a href="#创建虚拟机" class="headerlink" title="创建虚拟机"></a>创建虚拟机</h2><p>VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox 创建虚拟机。</p>
+<p>选择 <code>新建</code>，在弹出框中输入虚拟机名称并选择类型和版本，本例中安装的是 CentOS 7 所以类型选择 Linux 版本选择 Red Hat(64-bit)，点击继续直到创建成功。</p>
+<a id="more"></a>
+
+<p><img src="https://i.loli.net/2020/06/11/7nDRSFrNgqsoLcz.png" alt="1.png"></p>
+<p>选中新创建的虚拟机，点击 <code>设置</code>，在弹出框中选中 <code>存储</code>，点击左侧的 <code>没有盘片</code>，在右侧点击光盘的 icon，选择本地事先准备好的 CentOS 7 的镜像文件（镜像在官网下载 <a href="http://www.centos.org" target="_blank" rel="noopener">http://www.centos.org</a>），然后点 OK。</p>
+<p><img src="https://i.loli.net/2020/06/11/VYwIcZOeiUWKqTN.png" alt="2.png"></p>
+<p>配置好系统镜像之后，启动虚拟机。</p>
+<p><img src="https://i.loli.net/2020/06/11/ZDlOmA5zX3hdFUS.png" alt="3.png"></p>
+<p>选择 <code>Install CentOS 7</code>。</p>
+<p>常规检查完成之后进入系统安装界面，language 可以默认 English 或者选择中文，然后点击 <code>Continue</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/nO62zUSCY3uLsRK.png" alt="4.png"></p>
+<p>这里会自动检查时区语言和键盘等设置，都是自动完成的，但系统盘的盘符设置需要手动确认一下。</p>
+<p><img src="https://i.loli.net/2020/06/11/vztqn8mxrDUH6ky.png" alt="5.png"></p>
+<p>点击 <code>INSTALLATION DESTINATION</code> 然后点击 <code>Done</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/gYUJ62fWDN4Qlk5.png" alt="6.png"></p>
+<p>然后等待系统检测没问题之后，<code>Begin Installation</code> 按钮就可以点击了。</p>
+<p><img src="https://i.loli.net/2020/06/11/19XzJcGgNlyKe2A.png" alt="7.png"></p>
+<p>然后等待系统安装完成，这里可以设置一下ROOT用户的密码，点击 <code>ROOT PASSWORD</code>，设置完密码后点击 <code>Done</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/p78Tdat5Z4RufMv.png" alt="8.png"></p>
+<p>安装完成，重启点击 <code>Reboot</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/YtsNTiG76anvQzc.png" alt="9.png"></p>
+<p>到这里 CentOS 7 安装完成，输入账号和密码进入系统。</p>
+<p><img src="https://i.loli.net/2020/06/11/zjZKhGTCoLyvDOa.png" alt="10.png"></p>
+<h2 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h2><p>本例演示的方式是 <code>NAT Network</code> 加上 <code>Host-Only</code> 的模式，所以这里我们需要准备两张网卡，先停掉虚拟机 <code>shutdown now</code>。</p>
+<p>1、NAT Network 网卡配置</p>
+<p>选择 VirtualBox 的 <code>偏好设置</code>，点击 <code>网络</code>，点击右侧的加号新增 NAT 网络后，点击 <code>OK</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/Vo5ibHexXM1wnTm.png" alt="11.png"></p>
+<p>2、Host-Only 网卡配置</p>
+<p>选择 VirtualBox 的 <code>全局工具</code>，选择 <code>主机网络管理器</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/pjnGFCsq5DScvtM.png" alt="12.png"></p>
+<p>点击 <code>创建</code></p>
+<p><img src="https://i.loli.net/2020/06/11/Uh3SvMmkRgPwf2T.png" alt="13.png"></p>
+<p>到这里网卡就添加好了，现在我们需要将添加的网卡配置到虚拟机系统上。</p>
+<p>选中上面创建的虚拟机，点击 <code>设置</code>，在弹出框中选择 <code>网络</code>，选择 <code>网卡1</code> 并启用网络连接，将连接方式改成 <code>NAT网络</code>，界面名称会默认选中 <code>NatNetwork</code> 这就是上面我们准备的第一张网卡。</p>
+<p><img src="https://i.loli.net/2020/06/11/dUazKSeETX2W4Jl.png" alt="14.png"></p>
+<p>接着我们配置第二张网卡，还是上面的界面，选择 <code>网卡2</code>，勾选 <code>启用网络连接</code>，连接方式选择 <code>仅主机(Host-Only)网络</code>，界面名称会默认选中 <code>vboxnet0</code> 这就是上面我们准备的第二张网卡。</p>
+<p><img src="https://i.loli.net/2020/06/11/DbhgJi9ZsWjL5Up.png" alt="15.png"></p>
+<p>点击 OK，这里就将上面我们准备的两张网卡都配置到虚拟机系统中了。</p>
+<blockquote>
+<p>这里有个细节需要注意一下，在网卡1、网卡2高级设置中，两张网卡都会有 MAC 地址，这里的地址我们下面在配置网络的时候需要使用到</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/06/11/naJsmzoR7dNkqQL.png" alt="16.png"></p>
+<h2 id="虚拟机访问外网"><a href="#虚拟机访问外网" class="headerlink" title="虚拟机访问外网"></a>虚拟机访问外网</h2><p>因为我安装的系统镜像是 <code>Minimal ISO</code> 最小镜像，网络配置需要手动修改，以及很多其他依赖包也需要手动安装，这里我们先配置虚拟机让它能正常访问外网。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /etc/sysconfig/network-scripts/</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/3stIY81HAlFbBf7.png" alt="17.png"></p>
+<p>编辑网卡配置文件 <code>ifcfg-enp0s3</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vi ifcfg-enp0s3</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/ZNxuUA3n6OFMR2p.png" alt="18.png"></p>
+<p>在配置中增加 <code>HWADDR</code> 参数，并修改 <code>ONBOOT</code> 参数的值为 <code>yes</code>。</p>
+<p><img src="https://i.loli.net/2020/06/11/YNP1UGa8msryzek.png" alt="19.png"></p>
+<blockquote>
+<p>这里 <code>HWADDR</code> 的值就是上面配置的 NAT 网卡的 MAC 地址<br>这里改的 <code>enp0s3</code> 文件是 <code>网卡1</code> <code>NAT网卡</code> 的配置文件</p>
+</blockquote>
+<p>修改完配置文件保存退出，然后重启网卡。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl restart network</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/cqTdsxJmpvR6a9W.png" alt="20.png"></p>
+<p>测试外网是否可以正常访问。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ping baidu.com</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/y3SudZ6Re1vLEiJ.png" alt="21.png"></p>
+<p>不出意外，到这里虚拟机访问外网就完成了，下面我们继续配置，让宿主机可以访问虚拟机。</p>
+<h2 id="宿主机访问虚拟机"><a href="#宿主机访问虚拟机" class="headerlink" title="宿主机访问虚拟机"></a>宿主机访问虚拟机</h2><p>上面我们添加的 <code>网卡2</code>，连接方式为 <code>仅主机(Host-Only)网络</code> 就是专门用来让宿主机连接的。回到 CentOS 系统内，我们先查看一下网卡的情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ip addr</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/YTL8rphqxeAtMNV.png" alt="22.png"></p>
+<p>这里我们发现有两张网卡，<code>enp0s3</code> 和 <code>enp0s8</code>，第一张 <code>enp0s3</code> 就是上面一步配置虚拟机访问外网的网卡，可以看到 <code>dhcp</code> 默认分配的ip地址是 <code>10.0.2.7</code>。但第二张网卡没有正常启用，现在我们需要对第二张网卡进行配置，还是进入到 <code>/etc/sysconfig/network-scripts/</code> 目录下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /etc/sysconfig/network-scripts/</span></span><br></pre></td></tr></table></figure>
+
+<p>进入后会发现根本就没有第二张网卡对应的配置文件 <code>ifcfg-enp0s8</code>，不要方，我们把 <code>ifcfg-enp0s3</code> 文件复制一份改个名字就可以了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cp ifcfg-enp0s3 ifcfg-enp0s8</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/11/W7k4eCqR32zPmxF.png" alt="23.png"></p>
+<p>接下来修改 <code>ifcfg-enp0s8</code> 文件</p>
+<p>把 <code>HWADDR</code> 的值改为网卡2的 MAC 地址</p>
+<p>将 <code>BOOTPROTO</code> 的值改为 <code>static</code></p>
+<p>将 <code>NAME</code> 和 <code>DEVICE</code> 的值改为 <code>enp0s8</code></p>
+<p>将 <code>UUID</code> 的值改为和 <code>ifcfg-enp0s3</code> 中的不一样，可以随便填</p>
+<p>增加 <code>IPADDR</code>，手动设置一个静态IP</p>
+<p>增加 <code>NETMASK=255.255.255.0</code></p>
+<p><img src="https://i.loli.net/2020/06/11/hezrgJHqdL6MNFP.png" alt="24.png"></p>
+<p>配置完成后重启网卡，然后查看网卡情况，可以看到 <code>enp0s8</code> 正常启用了。</p>
+<p><img src="https://i.loli.net/2020/06/11/3PaHRJVMBTkpb2L.png" alt="25.png"></p>
+<p>我们在宿主机上尝试ping一下虚拟机。</p>
+<p><img src="https://i.loli.net/2020/06/11/9vywAF2tsCapDSI.png" alt="26.png"></p>
+<p>完全正常，接着尝试 ssh 到虚拟机，也是可以正常连接的。</p>
+<p><img src="https://i.loli.net/2020/06/11/I5v9w7groV1aUMW.png" alt="27.png"></p>
+<blockquote>
+<p>上面 <code>IPADDR</code> 的静态IP配置需要参考 <code>Host-Only网卡配置</code> 中的 <code>IPv4网络掩码</code><br>比如是 <code>192.168.56.1/24</code>，这里我们在设置静态IP的时候最后一位就可以在2-254中间随便设置</p>
+</blockquote>
+<h2 id="多台虚拟机内网互通"><a href="#多台虚拟机内网互通" class="headerlink" title="多台虚拟机内网互通"></a>多台虚拟机内网互通</h2><p>完成上面的配置后，一台机器的网络配置就完成了，剩下的两台按照上面的步骤虚拟机访问外网、宿主机访问虚拟机就可以了，这里要注意，全局添加的 <code>NAT Network网卡</code> 和 <code>Host-Only网卡</code> 不用重复添加，多台虚拟机可以公用</p>
+<p>多台机器配置完成后，内网就是互通的，一般默认情况下，<code>NAT Network网卡</code> 使用的是 <code>10.0.2</code> 网段</p>
+<p>Dnoe. :coffee:</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/VirtualBox/" rel="tag"># VirtualBox</a>
+              <a href="/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/" rel="tag"># 虚拟机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" rel="prev" title="如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins">
+      <i class="fa fa-chevron-left"></i> 如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" rel="next" title="ELK7.6.2部署教程">
+      ELK7.6.2部署教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建虚拟机"><span class="nav-number">1.</span> <span class="nav-text">创建虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络配置"><span class="nav-number">2.</span> <span class="nav-text">网络配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟机访问外网"><span class="nav-number">3.</span> <span class="nav-text">虚拟机访问外网</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#宿主机访问虚拟机"><span class="nav-number">4.</span> <span class="nav-text">宿主机访问虚拟机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多台虚拟机内网互通"><span class="nav-number">5.</span> <span class="nav-text">多台虚拟机内网互通</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
