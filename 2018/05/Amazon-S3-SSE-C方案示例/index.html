@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="开发环境Mac OSJDK1.7Eclipse 前言亚马逊云分国内亚马逊云存储(AWS中国)和国外亚马逊云存储(AWS全球)，这两套账号是独立的，在注册账号时需要留意。国内的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，整个过程网络速度没有优化，按照实际的网络速度上传。国外的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，还有额外的收费一个功能，加速下载和加速上传">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Amazon S3 SSE-C方案示例">
+<meta property="og:url" content="https://softgoto.github.io/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="开发环境Mac OSJDK1.7Eclipse 前言亚马逊云分国内亚马逊云存储(AWS中国)和国外亚马逊云存储(AWS全球)，这两套账号是独立的，在注册账号时需要留意。国内的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，整个过程网络速度没有优化，按照实际的网络速度上传。国外的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，还有额外的收费一个功能，加速下载和加速上传">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-05-03T17:36:06.000Z">
+<meta property="article:modified_time" content="2018-05-03T17:36:06.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="S3">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://softgoto.github.io/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Amazon S3 SSE-C方案示例 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Amazon S3 SSE-C方案示例
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-03 17:36:06" itemprop="dateCreated datePublished" datetime="2018-05-03T17:36:06+00:00">2018-05-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><p>Mac OS<br>JDK1.7<br>Eclipse</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>亚马逊云分国内亚马逊云存储(<a href="https://www.amazonaws.cn/" target="_blank" rel="noopener">AWS中国</a>)和国外亚马逊云存储(<a href="https://aws.amazon.com" target="_blank" rel="noopener">AWS全球</a>)，这两套账号是独立的，在注册账号时需要留意。国内的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，整个过程网络速度没有优化，按照实际的网络速度上传。国外的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，还有额外的收费一个功能，加速下载和加速上传；整个过程会充分利用网络资源提高数据传输速度。</p>
+<p>国内的亚马逊云存储加密功能是没有阉割的，国内上传文件到国内亚马逊云存储，上传速度平均是 540K/s ，高峰时段速度会降低。国内上传文件到国外亚马逊云存储，上传速度是 62k/s ，没有使用加速功能。</p>
+<a id="more"></a>
+
+<h2 id="账号配置"><a href="#账号配置" class="headerlink" title="账号配置"></a>账号配置</h2><h3 id="创建-Bucket"><a href="#创建-Bucket" class="headerlink" title="创建 Bucket"></a>创建 Bucket</h3><p>Bucket 就是桶，也叫存储桶，用来存放资源的。直接在 AWS 管理页面上操作就不介绍了</p>
+<h3 id="创建-IAM-用户"><a href="#创建-IAM-用户" class="headerlink" title="创建 IAM 用户"></a>创建 IAM 用户</h3><p>1、在管理平台添加一个用户，访问类型选编程访问，权限先不用给</p>
+<p>2、创建完成后记录下 <code>访问私钥ID</code> 和 <code>私有访问密钥</code>，很重要，后面会用到</p>
+<p>3、点开创建的用户，给用户添加权限</p>
+<p>4、点击添加内联策略，选择策略生成器</p>
+<p>5、AWS 服务选择 <code>Amazon S3</code></p>
+<p>6、操作先选读写 <code>PutObject</code> 和 <code>GetObject</code>，不够后面再改</p>
+<p>7、ARN 填*，这里其实可以对资源进行权限控制，很强大</p>
+<p>8、添加声明，下一步，验证策略，没问题就应用策略</p>
+<p>9、当前创建的 IAM 用户就可以上传和下载 Object 了</p>
+<h2 id="AWS-环境搭建"><a href="#AWS-环境搭建" class="headerlink" title="AWS 环境搭建"></a>AWS 环境搭建</h2><h3 id="下载-SDK"><a href="#下载-SDK" class="headerlink" title="下载 SDK"></a>下载 SDK</h3><p>1、下载最新版的 <a href="https://sdk-for-java.amazonwebservices.com/latest/aws-java-sdk.zip" target="_blank" rel="noopener">AWS SDK</a></p>
+<p>2、解压 <code>aws-java-sdk.zip</code> 并将 <code>lib</code> 和 <code>third-party/lib</code> 下的 <code>jar</code> 添加到工程中</p>
+<h3 id="环境变量配置（Credentials-and-Region）"><a href="#环境变量配置（Credentials-and-Region）" class="headerlink" title="环境变量配置（Credentials and Region）"></a>环境变量配置（Credentials and Region）</h3><p><a href="http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html" target="_blank" rel="noopener">参考这里</a></p>
+<h4 id="设置-Credentials"><a href="#设置-Credentials" class="headerlink" title="设置 Credentials"></a>设置 Credentials</h4><p>在 Linux、OS X 或 Unix 环境下，like this <code>~/.aws/credentials</code></p>
+<p>在 <code>~/</code> 目录下创建 <code>.aws</code> 文件夹和 <code>credentials</code> 文件</p>
+<p>在 Windows 环境下</p>
+<p>同上创建 <code>.aws</code> 文件夹和 <code>credentials</code> 文件，like this <code>C:\Users\USERNAME\.aws\credentials</code></p>
+<p>然后在创建的文件中写入一下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[default]</span><br><span class="line">aws_access_key_id &#x3D; your_access_key_id</span><br><span class="line">aws_secret_access_key &#x3D; your_secret_access_key</span><br></pre></td></tr></table></figure>
+
+<p>把 <code>your_access_key_id</code> 和 <code>your_secret_access_key</code> 替换成自己对应的信息，这些信息就是上面创建 IAM 用户时生成的 <code>访问私钥ID</code> 和 <code>私有访问密钥</code></p>
+<h4 id="设置-Region"><a href="#设置-Region" class="headerlink" title="设置 Region"></a>设置 Region</h4><p>在上面创建的 <code>.aws</code> 目录下再创建一个 <code>config</code> 文件，Windows 或者 Linux 都一样</p>
+<p><code>~/.aws/config</code> 在 Linux, OS X, or Unix 系统这样</p>
+<p><code>C:\Users\USERNAME\.aws\config</code> 在 Windows 系统这样</p>
+<p>然后在创建的 config 文件中写入一下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[default]</span><br><span class="line">region &#x3D; your_aws_region</span><br></pre></td></tr></table></figure>
+
+<p>把 <code>your_aws_region</code> 替换成自己对应的信息，这些信息可以在管理平台找到，不填默认是 <code>us-east-1</code> (If you don’t select a region, then us-east-1 will be used by default.)</p>
+<h2 id="写代码"><a href="#写代码" class="headerlink" title="写代码"></a>写代码</h2><p>下面代码中验证了上传没加密文件、下载没加密文件、上传文件且服务端加密、下载加密文件、下载加密文件不给密钥、获取加密文件的元数据、获取没加密文件的元数据</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xxx.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.OutputStream;</span><br><span class="line"><span class="keyword">import</span> java.nio.file.Paths;</span><br><span class="line"><span class="keyword">import</span> java.security.SecureRandom;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.crypto.KeyGenerator;</span><br><span class="line"><span class="keyword">import</span> javax.crypto.SecretKey;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.amazonaws.auth.profile.ProfileCredentialsProvider;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.AmazonS3;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.AmazonS3Client;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.GetObjectMetadataRequest;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.GetObjectRequest;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.ObjectMetadata;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.PutObjectRequest;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.S3Object;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.S3ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.services.s3.model.SSECustomerKey;</span><br><span class="line"><span class="keyword">import</span> com.amazonaws.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SSECDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> String bucketName = <span class="string">"softgoto"</span>;<span class="comment">// 后台已经创建名为 softgoto 的 Bucket 用来测试</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String keyName = <span class="string">""</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String workspace = <span class="string">"/Users/softgoto/Desktop/"</span>;<span class="comment">// 读取文件和输出文件的路径</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> AmazonS3 s3client;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> SecretKey secretKey;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> SSECustomerKey sseKey;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    	s3client = <span class="keyword">new</span> AmazonS3Client(<span class="keyword">new</span> ProfileCredentialsProvider());</span><br><span class="line">    	System.out.println(<span class="string">"----------------创建密钥----------------"</span>);</span><br><span class="line">    	<span class="comment">// 创建加密key</span></span><br><span class="line">        secretKey = generateSecretKey();</span><br><span class="line">        sseKey = <span class="keyword">new</span> SSECustomerKey(secretKey);</span><br><span class="line">    	</span><br><span class="line">        System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------上传加密----------------"</span>);</span><br><span class="line">    	<span class="comment">//上传文件服务端加密</span></span><br><span class="line">    	serverSideEncryptionPutObject();</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------上传不加密----------------"</span>);</span><br><span class="line">    	<span class="comment">//上传文件服务端不加密</span></span><br><span class="line">    	serverSideDonotEncryptionPutObject();</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------获取加密文件不给密钥----------------"</span>);</span><br><span class="line">    	<span class="comment">//获取加密文件不给密钥</span></span><br><span class="line">    	getObject(<span class="string">"加密文件.jpg"</span>, <span class="keyword">null</span>);</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------获取加密文件给密钥----------------"</span>);</span><br><span class="line">    	<span class="comment">//获取加密文件给密钥</span></span><br><span class="line">    	getObject(<span class="string">"加密文件.jpg"</span>, sseKey);</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------获取没有加密的文件----------------"</span>);</span><br><span class="line">    	<span class="comment">//获取没有加密的文件</span></span><br><span class="line">    	getObject(<span class="string">"不加密文件.png"</span>, <span class="keyword">null</span>);</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------获取加密文件元数据----------------"</span>);</span><br><span class="line">        <span class="comment">//获取加密文件元数据</span></span><br><span class="line">        retrieveObjectMetadata(<span class="string">"加密文件.jpg"</span>, sseKey);</span><br><span class="line">        </span><br><span class="line">        System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------获取未加密文件元数据----------------"</span>);</span><br><span class="line">        <span class="comment">//获取未加密文件元数据</span></span><br><span class="line">        retrieveObjectMetadata(<span class="string">"不加密文件.png"</span>, <span class="keyword">null</span>);</span><br><span class="line">    	</span><br><span class="line">    	System.out.println(<span class="string">"\n\n"</span>);</span><br><span class="line">        System.out.println(<span class="string">"----------------Done!----------------"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 服务端加密上传</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">serverSideEncryptionPutObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    	String uploadFileName = <span class="string">"加密文件.jpg"</span>;</span><br><span class="line">    	keyName = Paths.get(workspace + uploadFileName).getFileName().toString();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            File file = <span class="keyword">new</span> File(workspace + uploadFileName);</span><br><span class="line">            </span><br><span class="line">            System.out.println(<span class="string">"上传文件，并且让服务端加密"</span>);</span><br><span class="line">            System.out.println(<span class="string">"AES256密钥: "</span>+Base64.encodeAsString(secretKey.getEncoded()));</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 上传文件</span></span><br><span class="line">            uploadObject(file, sseKey);</span><br><span class="line"></span><br><span class="line">         &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(e);</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取文件-传或者不传密钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> sseKey</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">getObject</span><span class="params">(String fileName, SSECustomerKey sseKey)</span> </span>&#123;</span><br><span class="line">    	<span class="keyword">try</span> &#123;</span><br><span class="line">    		keyName = Paths.get(workspace + fileName).getFileName().toString();</span><br><span class="line">    		</span><br><span class="line">    		<span class="keyword">if</span>(sseKey != <span class="keyword">null</span>)&#123;</span><br><span class="line">    			System.out.println(<span class="string">"AES256密钥: "</span>+Base64.encodeAsString(secretKey.getEncoded()));</span><br><span class="line">    		&#125;</span><br><span class="line">    		</span><br><span class="line">			<span class="comment">// 下载文件</span></span><br><span class="line">			downloadObject(sseKey);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			System.out.println(e);</span><br><span class="line">		&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 服务端不加密上传</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">serverSideDonotEncryptionPutObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    	String uploadFileName = <span class="string">"不加密文件.png"</span>;</span><br><span class="line">    	keyName = Paths.get(workspace + uploadFileName).getFileName().toString();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            File file = <span class="keyword">new</span> File(workspace + uploadFileName);</span><br><span class="line">            System.out.println(<span class="string">"上传文件，服务端不加密"</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 上传文件</span></span><br><span class="line">            uploadObject(file, <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">         &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> PutObjectRequest <span class="title">uploadObject</span><span class="params">(File file, SSECustomerKey sseKey)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 1. Upload Object.</span></span><br><span class="line">        PutObjectRequest putObjectRequest = <span class="keyword">null</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(sseKey == <span class="keyword">null</span>)&#123;</span><br><span class="line">        	putObjectRequest = <span class="keyword">new</span> PutObjectRequest(bucketName, keyName, file);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        	putObjectRequest = <span class="keyword">new</span> PutObjectRequest(bucketName, keyName, file).withSSECustomerKey(sseKey);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        s3client.putObject(putObjectRequest);</span><br><span class="line">        System.out.println(<span class="string">"文件上传完成!"</span>);</span><br><span class="line">        <span class="keyword">return</span> putObjectRequest;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">downloadObject</span><span class="params">(SSECustomerKey sseKey)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Get a range of bytes from an object.</span></span><br><span class="line">    	System.out.println(<span class="string">"开始下载保存文件"</span>);</span><br><span class="line">        GetObjectRequest getObjectRequest = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(sseKey == <span class="keyword">null</span>)&#123;</span><br><span class="line">        	getObjectRequest = <span class="keyword">new</span> GetObjectRequest(bucketName, keyName);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        	getObjectRequest = <span class="keyword">new</span> GetObjectRequest(bucketName, keyName).withSSECustomerKey(sseKey);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        S3Object s3Object = s3client.getObject(getObjectRequest);</span><br><span class="line"></span><br><span class="line">        saveInputStream(s3Object.getObjectContent(), <span class="string">"new_"</span>+s3Object.getKey());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">retrieveObjectMetadata</span><span class="params">(String fileName, SSECustomerKey sseKey)</span> </span>&#123;</span><br><span class="line">        GetObjectMetadataRequest getMetadataRequest = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(sseKey == <span class="keyword">null</span>)&#123;</span><br><span class="line">        	getMetadataRequest = <span class="keyword">new</span> GetObjectMetadataRequest(bucketName, fileName);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        	getMetadataRequest = <span class="keyword">new</span> GetObjectMetadataRequest(bucketName, fileName).withSSECustomerKey(sseKey);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        ObjectMetadata objectMetadata = s3client.getObjectMetadata(getMetadataRequest);</span><br><span class="line">        System.out.println(<span class="string">"对象大小: "</span> + objectMetadata.getContentLength());</span><br><span class="line">        System.out.println(<span class="string">"元数据校验完成!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">saveInputStream</span><span class="params">(S3ObjectInputStream inputStream, String fileName)</span> </span>&#123;</span><br><span class="line">        OutputStream os = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String path = workspace;</span><br><span class="line">            <span class="comment">// 2、保存到临时文件</span></span><br><span class="line">            <span class="comment">// 1K的数据缓冲</span></span><br><span class="line">            <span class="keyword">byte</span>[] bs = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line">            <span class="comment">// 读取到的数据长度</span></span><br><span class="line">            <span class="keyword">int</span> len;</span><br><span class="line">            <span class="comment">// 输出的文件流保存到本地文件</span></span><br><span class="line"></span><br><span class="line">            File tempFile = <span class="keyword">new</span> File(path);</span><br><span class="line">            <span class="keyword">if</span> (!tempFile.exists()) &#123;</span><br><span class="line">            	System.out.println(<span class="string">"Path is not exists!"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            os = <span class="keyword">new</span> FileOutputStream(tempFile.getPath() + File.separator + fileName);</span><br><span class="line">            <span class="comment">// 开始读取</span></span><br><span class="line">            <span class="keyword">while</span> ((len = inputStream.read(bs)) != -<span class="number">1</span>) &#123;</span><br><span class="line">                os.write(bs, <span class="number">0</span>, len);</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            System.out.println(<span class="string">"文件已保存到本地!"</span>);</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 完毕，关闭所有链接</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                os.close();</span><br><span class="line">                inputStream.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 创建AES-256密钥</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> SecretKey Object</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> SecretKey <span class="title">generateSecretKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        	SecretKey key = <span class="keyword">null</span>;</span><br><span class="line">        	System.out.println(<span class="string">"生成AES256密钥"</span>);</span><br><span class="line">            KeyGenerator generator = KeyGenerator.getInstance(<span class="string">"AES"</span>);</span><br><span class="line">            generator.init(<span class="number">256</span>, <span class="keyword">new</span> SecureRandom());</span><br><span class="line">            key = generator.generateKey();</span><br><span class="line">            System.out.println(<span class="string">"AES256密钥已生成"</span>);</span><br><span class="line">            System.out.println(<span class="string">"AES256密钥："</span>+Base64.encodeAsString(key.getEncoded()));</span><br><span class="line">            <span class="keyword">return</span> key;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            System.exit(-<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>Done. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AWS/" rel="tag"># AWS</a>
+              <a href="/tags/S3/" rel="tag"># S3</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/CentOS-7%E9%85%8D%E7%BD%AESSH-Key%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/" rel="prev" title="CentOS 7配置SSH Key实现免密登录">
+      <i class="fa fa-chevron-left"></i> CentOS 7配置SSH Key实现免密登录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="next" title="VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)">
+      VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开发环境"><span class="nav-number">1.</span> <span class="nav-text">开发环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#账号配置"><span class="nav-number">3.</span> <span class="nav-text">账号配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Bucket"><span class="nav-number">3.1.</span> <span class="nav-text">创建 Bucket</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-IAM-用户"><span class="nav-number">3.2.</span> <span class="nav-text">创建 IAM 用户</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AWS-环境搭建"><span class="nav-number">4.</span> <span class="nav-text">AWS 环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载-SDK"><span class="nav-number">4.1.</span> <span class="nav-text">下载 SDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#环境变量配置（Credentials-and-Region）"><span class="nav-number">4.2.</span> <span class="nav-text">环境变量配置（Credentials and Region）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设置-Credentials"><span class="nav-number">4.2.1.</span> <span class="nav-text">设置 Credentials</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置-Region"><span class="nav-number">4.2.2.</span> <span class="nav-text">设置 Region</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写代码"><span class="nav-number">5.</span> <span class="nav-text">写代码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

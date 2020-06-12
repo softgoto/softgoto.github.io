@@ -23,7 +23,7 @@
 
   <meta name="description" content="本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。 先介绍一下环境宿主机：macOS High Sierra 10.13.6虚拟机工具：Oracle VM VirtualBox 5.2.18虚拟机系统：CentOS 7 创建虚拟机VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox">
 <meta property="og:type" content="article">
-<meta property="og:title" content="VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)">
+<meta property="og:title" content="VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)">
 <meta property="og:url" content="https://softgoto.github.io/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/index.html">
 <meta property="og:site_name" content="softgoto的个人博客">
 <meta property="og:description" content="本篇介绍一下如何配置虚拟机网络，实现多台虚拟机可以正常访问外网同时内部可以互通，并且可以通过宿主机控制三台虚拟机。 先介绍一下环境宿主机：macOS High Sierra 10.13.6虚拟机工具：Oracle VM VirtualBox 5.2.18虚拟机系统：CentOS 7 创建虚拟机VirtualBox 的安装这里就不介绍，具体可以 Google。下面介绍如何使用 VirtualBox">
@@ -76,7 +76,7 @@
   };
 </script>
 
-  <title>VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only) | softgoto的个人博客</title>
+  <title>VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only) | softgoto的个人博客</title>
   
 
 
@@ -210,7 +210,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)
+          VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)
         </h1>
 
         <div class="post-meta">
@@ -263,78 +263,78 @@
 <p>选择 <code>新建</code>，在弹出框中输入虚拟机名称并选择类型和版本，本例中安装的是 CentOS 7 所以类型选择 Linux 版本选择 Red Hat(64-bit)，点击继续直到创建成功。</p>
 <a id="more"></a>
 
-<p><img src="https://i.loli.net/2020/06/11/7nDRSFrNgqsoLcz.png" alt="1.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/7nDRSFrNgqsoLcz.png" alt=""></p>
 <p>选中新创建的虚拟机，点击 <code>设置</code>，在弹出框中选中 <code>存储</code>，点击左侧的 <code>没有盘片</code>，在右侧点击光盘的 icon，选择本地事先准备好的 CentOS 7 的镜像文件（镜像在官网下载 <a href="http://www.centos.org" target="_blank" rel="noopener">http://www.centos.org</a>），然后点 OK。</p>
-<p><img src="https://i.loli.net/2020/06/11/VYwIcZOeiUWKqTN.png" alt="2.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/VYwIcZOeiUWKqTN.png" alt=""></p>
 <p>配置好系统镜像之后，启动虚拟机。</p>
-<p><img src="https://i.loli.net/2020/06/11/ZDlOmA5zX3hdFUS.png" alt="3.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/ZDlOmA5zX3hdFUS.png" alt=""></p>
 <p>选择 <code>Install CentOS 7</code>。</p>
 <p>常规检查完成之后进入系统安装界面，language 可以默认 English 或者选择中文，然后点击 <code>Continue</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/nO62zUSCY3uLsRK.png" alt="4.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/nO62zUSCY3uLsRK.png" alt=""></p>
 <p>这里会自动检查时区语言和键盘等设置，都是自动完成的，但系统盘的盘符设置需要手动确认一下。</p>
-<p><img src="https://i.loli.net/2020/06/11/vztqn8mxrDUH6ky.png" alt="5.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/vztqn8mxrDUH6ky.png" alt=""></p>
 <p>点击 <code>INSTALLATION DESTINATION</code> 然后点击 <code>Done</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/gYUJ62fWDN4Qlk5.png" alt="6.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/gYUJ62fWDN4Qlk5.png" alt=""></p>
 <p>然后等待系统检测没问题之后，<code>Begin Installation</code> 按钮就可以点击了。</p>
-<p><img src="https://i.loli.net/2020/06/11/19XzJcGgNlyKe2A.png" alt="7.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/19XzJcGgNlyKe2A.png" alt=""></p>
 <p>然后等待系统安装完成，这里可以设置一下ROOT用户的密码，点击 <code>ROOT PASSWORD</code>，设置完密码后点击 <code>Done</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/p78Tdat5Z4RufMv.png" alt="8.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/p78Tdat5Z4RufMv.png" alt=""></p>
 <p>安装完成，重启点击 <code>Reboot</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/YtsNTiG76anvQzc.png" alt="9.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/YtsNTiG76anvQzc.png" alt=""></p>
 <p>到这里 CentOS 7 安装完成，输入账号和密码进入系统。</p>
-<p><img src="https://i.loli.net/2020/06/11/zjZKhGTCoLyvDOa.png" alt="10.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/zjZKhGTCoLyvDOa.png" alt=""></p>
 <h2 id="网络配置"><a href="#网络配置" class="headerlink" title="网络配置"></a>网络配置</h2><p>本例演示的方式是 <code>NAT Network</code> 加上 <code>Host-Only</code> 的模式，所以这里我们需要准备两张网卡，先停掉虚拟机 <code>shutdown now</code>。</p>
 <p>1、NAT Network 网卡配置</p>
 <p>选择 VirtualBox 的 <code>偏好设置</code>，点击 <code>网络</code>，点击右侧的加号新增 NAT 网络后，点击 <code>OK</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/Vo5ibHexXM1wnTm.png" alt="11.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/Vo5ibHexXM1wnTm.png" alt=""></p>
 <p>2、Host-Only 网卡配置</p>
 <p>选择 VirtualBox 的 <code>全局工具</code>，选择 <code>主机网络管理器</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/pjnGFCsq5DScvtM.png" alt="12.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/pjnGFCsq5DScvtM.png" alt=""></p>
 <p>点击 <code>创建</code></p>
-<p><img src="https://i.loli.net/2020/06/11/Uh3SvMmkRgPwf2T.png" alt="13.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/Uh3SvMmkRgPwf2T.png" alt=""></p>
 <p>到这里网卡就添加好了，现在我们需要将添加的网卡配置到虚拟机系统上。</p>
 <p>选中上面创建的虚拟机，点击 <code>设置</code>，在弹出框中选择 <code>网络</code>，选择 <code>网卡1</code> 并启用网络连接，将连接方式改成 <code>NAT网络</code>，界面名称会默认选中 <code>NatNetwork</code> 这就是上面我们准备的第一张网卡。</p>
-<p><img src="https://i.loli.net/2020/06/11/dUazKSeETX2W4Jl.png" alt="14.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/dUazKSeETX2W4Jl.png" alt=""></p>
 <p>接着我们配置第二张网卡，还是上面的界面，选择 <code>网卡2</code>，勾选 <code>启用网络连接</code>，连接方式选择 <code>仅主机(Host-Only)网络</code>，界面名称会默认选中 <code>vboxnet0</code> 这就是上面我们准备的第二张网卡。</p>
-<p><img src="https://i.loli.net/2020/06/11/DbhgJi9ZsWjL5Up.png" alt="15.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/DbhgJi9ZsWjL5Up.png" alt=""></p>
 <p>点击 OK，这里就将上面我们准备的两张网卡都配置到虚拟机系统中了。</p>
 <blockquote>
 <p>这里有个细节需要注意一下，在网卡1、网卡2高级设置中，两张网卡都会有 MAC 地址，这里的地址我们下面在配置网络的时候需要使用到</p>
 </blockquote>
-<p><img src="https://i.loli.net/2020/06/11/naJsmzoR7dNkqQL.png" alt="16.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/naJsmzoR7dNkqQL.png" alt=""></p>
 <h2 id="虚拟机访问外网"><a href="#虚拟机访问外网" class="headerlink" title="虚拟机访问外网"></a>虚拟机访问外网</h2><p>因为我安装的系统镜像是 <code>Minimal ISO</code> 最小镜像，网络配置需要手动修改，以及很多其他依赖包也需要手动安装，这里我们先配置虚拟机让它能正常访问外网。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /etc/sysconfig/network-scripts/</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/3stIY81HAlFbBf7.png" alt="17.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/3stIY81HAlFbBf7.png" alt=""></p>
 <p>编辑网卡配置文件 <code>ifcfg-enp0s3</code>。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vi ifcfg-enp0s3</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/ZNxuUA3n6OFMR2p.png" alt="18.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/ZNxuUA3n6OFMR2p.png" alt=""></p>
 <p>在配置中增加 <code>HWADDR</code> 参数，并修改 <code>ONBOOT</code> 参数的值为 <code>yes</code>。</p>
-<p><img src="https://i.loli.net/2020/06/11/YNP1UGa8msryzek.png" alt="19.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/YNP1UGa8msryzek.png" alt=""></p>
 <blockquote>
 <p>这里 <code>HWADDR</code> 的值就是上面配置的 NAT 网卡的 MAC 地址<br>这里改的 <code>enp0s3</code> 文件是 <code>网卡1</code> <code>NAT网卡</code> 的配置文件</p>
 </blockquote>
 <p>修改完配置文件保存退出，然后重启网卡。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl restart network</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/cqTdsxJmpvR6a9W.png" alt="20.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/cqTdsxJmpvR6a9W.png" alt=""></p>
 <p>测试外网是否可以正常访问。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ping baidu.com</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/y3SudZ6Re1vLEiJ.png" alt="21.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/y3SudZ6Re1vLEiJ.png" alt=""></p>
 <p>不出意外，到这里虚拟机访问外网就完成了，下面我们继续配置，让宿主机可以访问虚拟机。</p>
 <h2 id="宿主机访问虚拟机"><a href="#宿主机访问虚拟机" class="headerlink" title="宿主机访问虚拟机"></a>宿主机访问虚拟机</h2><p>上面我们添加的 <code>网卡2</code>，连接方式为 <code>仅主机(Host-Only)网络</code> 就是专门用来让宿主机连接的。回到 CentOS 系统内，我们先查看一下网卡的情况</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ip addr</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/YTL8rphqxeAtMNV.png" alt="22.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/YTL8rphqxeAtMNV.png" alt=""></p>
 <p>这里我们发现有两张网卡，<code>enp0s3</code> 和 <code>enp0s8</code>，第一张 <code>enp0s3</code> 就是上面一步配置虚拟机访问外网的网卡，可以看到 <code>dhcp</code> 默认分配的ip地址是 <code>10.0.2.7</code>。但第二张网卡没有正常启用，现在我们需要对第二张网卡进行配置，还是进入到 <code>/etc/sysconfig/network-scripts/</code> 目录下</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /etc/sysconfig/network-scripts/</span></span><br></pre></td></tr></table></figure>
 
 <p>进入后会发现根本就没有第二张网卡对应的配置文件 <code>ifcfg-enp0s8</code>，不要方，我们把 <code>ifcfg-enp0s3</code> 文件复制一份改个名字就可以了。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cp ifcfg-enp0s3 ifcfg-enp0s8</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/W7k4eCqR32zPmxF.png" alt="23.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/W7k4eCqR32zPmxF.png" alt=""></p>
 <p>接下来修改 <code>ifcfg-enp0s8</code> 文件</p>
 <p>把 <code>HWADDR</code> 的值改为网卡2的 MAC 地址</p>
 <p>将 <code>BOOTPROTO</code> 的值改为 <code>static</code></p>
@@ -342,13 +342,13 @@
 <p>将 <code>UUID</code> 的值改为和 <code>ifcfg-enp0s3</code> 中的不一样，可以随便填</p>
 <p>增加 <code>IPADDR</code>，手动设置一个静态IP</p>
 <p>增加 <code>NETMASK=255.255.255.0</code></p>
-<p><img src="https://i.loli.net/2020/06/11/hezrgJHqdL6MNFP.png" alt="24.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/hezrgJHqdL6MNFP.png" alt=""></p>
 <p>配置完成后重启网卡，然后查看网卡情况，可以看到 <code>enp0s8</code> 正常启用了。</p>
-<p><img src="https://i.loli.net/2020/06/11/3PaHRJVMBTkpb2L.png" alt="25.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/3PaHRJVMBTkpb2L.png" alt=""></p>
 <p>我们在宿主机上尝试ping一下虚拟机。</p>
-<p><img src="https://i.loli.net/2020/06/11/9vywAF2tsCapDSI.png" alt="26.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/9vywAF2tsCapDSI.png" alt=""></p>
 <p>完全正常，接着尝试 ssh 到虚拟机，也是可以正常连接的。</p>
-<p><img src="https://i.loli.net/2020/06/11/I5v9w7groV1aUMW.png" alt="27.png"></p>
+<p><img src="https://i.loli.net/2020/06/11/I5v9w7groV1aUMW.png" alt=""></p>
 <blockquote>
 <p>上面 <code>IPADDR</code> 的静态IP配置需要参考 <code>Host-Only网卡配置</code> 中的 <code>IPv4网络掩码</code><br>比如是 <code>192.168.56.1/24</code>，这里我们在设置静态IP的时候最后一位就可以在2-254中间随便设置</p>
 </blockquote>
@@ -374,12 +374,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/" rel="prev" title="使用yum安装Mysql5.7">
-      <i class="fa fa-chevron-left"></i> 使用yum安装Mysql5.7
+    <a href="/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/" rel="prev" title="Amazon S3 SSE-C方案示例">
+      <i class="fa fa-chevron-left"></i> Amazon S3 SSE-C方案示例
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" rel="next" title="ELK7.6.2部署教程">
-      ELK7.6.2部署教程 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" rel="next" title="ELK7.6.2 部署教程">
+      ELK7.6.2 部署教程 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -455,7 +455,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -468,7 +468,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

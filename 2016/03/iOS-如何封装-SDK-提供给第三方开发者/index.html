@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="需求：我们需要将一些功能封装并提供给第三方开发者使用，也就是我们常说的第三方 SDK  思路：.a 和 Framework 先介绍一下静态库和动态库，静态库和动态库是相对编译期和运行期的，静态库以 .a 和 .framework 形式存在，链接时静态库会被完整地复制到可执行文件中，被多次使用就有多份冗余拷贝；动态库以 .dylib 和 .framework 形式存在，链接时不复制，程序运行时由系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 如何封装 SDK 提供给第三方开发者">
+<meta property="og:url" content="https://softgoto.github.io/2016/03/iOS-%E5%A6%82%E4%BD%95%E5%B0%81%E8%A3%85-SDK-%E6%8F%90%E4%BE%9B%E7%BB%99%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BC%80%E5%8F%91%E8%80%85/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="需求：我们需要将一些功能封装并提供给第三方开发者使用，也就是我们常说的第三方 SDK  思路：.a 和 Framework 先介绍一下静态库和动态库，静态库和动态库是相对编译期和运行期的，静态库以 .a 和 .framework 形式存在，链接时静态库会被完整地复制到可执行文件中，被多次使用就有多份冗余拷贝；动态库以 .dylib 和 .framework 形式存在，链接时不复制，程序运行时由系统">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/RDsJcPq7WAlKrGh.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/V5inMmD7ZbwSagd.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/6J7EBie8qzrY1ka.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/MvBwdmCGIZqYaLy.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/WxBALZsYGveJkh9.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/DLpawFsAb62HSJy.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/FzxvnroqlALDweg.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/MHCipmLwN1D98JI.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/aMCLKnIY9ARED8h.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/C1DuJBGvH46EyZS.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/ZXdz2wYHgI5RWBr.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/CjhXRqGKvnOW1QL.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/yzOXYcMBALab5xD.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/WFLXn2CrB7f4pmd.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/WeAZp8GNEMOvUIz.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/rZjH8toeJYOhDPw.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/hLF2XM9oIvngj3N.png">
+<meta property="article:published_time" content="2016-03-17T12:19:27.000Z">
+<meta property="article:modified_time" content="2016-03-17T12:19:27.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Xcode">
+<meta property="article:tag" content="SDK">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/06/12/RDsJcPq7WAlKrGh.png">
+
+<link rel="canonical" href="https://softgoto.github.io/2016/03/iOS-%E5%A6%82%E4%BD%95%E5%B0%81%E8%A3%85-SDK-%E6%8F%90%E4%BE%9B%E7%BB%99%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BC%80%E5%8F%91%E8%80%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>iOS 如何封装 SDK 提供给第三方开发者 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2016/03/iOS-%E5%A6%82%E4%BD%95%E5%B0%81%E8%A3%85-SDK-%E6%8F%90%E4%BE%9B%E7%BB%99%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BC%80%E5%8F%91%E8%80%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS 如何封装 SDK 提供给第三方开发者
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-17 12:19:27" itemprop="dateCreated datePublished" datetime="2016-03-17T12:19:27+00:00">2016-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>需求：我们需要将一些功能封装并提供给第三方开发者使用，也就是我们常说的第三方 SDK </p>
+<p>思路：<code>.a</code> 和 <code>Framework</code></p>
+<p>先介绍一下静态库和动态库，静态库和动态库是相对编译期和运行期的，静态库以 <code>.a</code> 和 <code>.framework</code> 形式存在，链接时静态库会被完整地复制到可执行文件中，被多次使用就有多份冗余拷贝；动态库以 <code>.dylib</code> 和 <code>.framework</code> 形式存在，链接时不复制，程序运行时由系统动态加载到内存供程序调用，系统只加载一次，多个程序共用节省内存，一般只能由系统创建。framework 为什么既是静态库又是动态库呢？这是因为系统的 <code>.framework</code> 是动态库，我们自己建立的 <code>.framework</code> 是静态库。</p>
+<a id="more"></a>
+
+<p>Framework 文件创建步骤：（iOS8 以上才能使用）这里我使用的是 Xcode7.2.1，代码我放在这里，有兴趣的可以参考一下。</p>
+<p><a href="https://github.com/softgoto/XHFramework" target="_blank" rel="noopener">https://github.com/softgoto/XHFramework</a><br><a href="https://github.com/softgoto/XHFrameworkUserDemo" target="_blank" rel="noopener">https://github.com/softgoto/XHFrameworkUserDemo</a></p>
+<p>1、新建Cocoa Touch Framework Project </p>
+<p><img src="https://i.loli.net/2020/06/12/RDsJcPq7WAlKrGh.png" alt=""></p>
+<p>2、命名 XHFramework</p>
+<p><img src="https://i.loli.net/2020/06/12/V5inMmD7ZbwSagd.png" alt=""></p>
+<p>3、导入组件代码 <a href="https://github.com/softgoto/RWKnobControl" target="_blank" rel="noopener">https://github.com/softgoto/RWKnobControl</a></p>
+<p><img src="https://i.loli.net/2020/06/12/6J7EBie8qzrY1ka.png" alt=""></p>
+<p>4、选择 Build Phases</p>
+<p><img src="https://i.loli.net/2020/06/12/MvBwdmCGIZqYaLy.png" alt=""></p>
+<p>5、在 Headers 中有 Public、Private、Projec 三块，Public 里的头文件是暴露给第三方的，Project 中的则只有当前项目可看，对第三方是隐藏的。</p>
+<p>6、这里我们把需要暴露给第三方调用的头文件拖到 Public 中</p>
+<p><img src="https://i.loli.net/2020/06/12/WxBALZsYGveJkh9.png" alt=""></p>
+<p>7、打包</p>
+<p>先选择 <code>iOS Device</code> 再按快捷键 <code>Command + B</code></p>
+<p><img src="https://i.loli.net/2020/06/12/DLpawFsAb62HSJy.png" alt=""></p>
+<p>然后选择模拟器按快捷键 <code>Command + B</code></p>
+<p><img src="https://i.loli.net/2020/06/12/FzxvnroqlALDweg.png" alt=""></p>
+<p>8、可以看到 Products 下的 <code>.framework</code> 文件已经由红色变成了黑色，说明 <code>.framework</code> 文件已经创建成功。选中文件点击右键 <code>Show in Finder</code></p>
+<p><img src="https://i.loli.net/2020/06/12/MHCipmLwN1D98JI.png" alt=""></p>
+<p>9、发现 Debug-iphoneos 和 Debug-iphonesimulator 目录下都有 <code>XHFramework.framework</code> 文件，这里我们需要将两个文件合并来兼容真机和模拟器调试使用。</p>
+<p>10、在合并之前我们先检查生成的文件所支持的框架类型</p>
+<p>11、先选中真机下的 framework 文件，可以看到里面有一个和 <code>XHFramework.framework</code> 同名但是没有后缀的文件（应该就是 <code>.a</code> 文件），打开终端输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> lipo -info 文件路径</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/06/12/aMCLKnIY9ARED8h.png" alt=""></p>
+<p>然后选择模拟器下的 framework 文件，在终端中输入同上命令</p>
+<p><img src="https://i.loli.net/2020/06/12/C1DuJBGvH46EyZS.png" alt=""></p>
+<p>12、合并（命令：lipo -create A文件 B文件 -output C输出路径）</p>
+<p><img src="https://i.loli.net/2020/06/12/ZXdz2wYHgI5RWBr.png" alt=""></p>
+<p>13、选择一个 framework 复制出来，然后打开将新生成的文件替换</p>
+<p><img src="https://i.loli.net/2020/06/12/CjhXRqGKvnOW1QL.png" alt=""></p>
+<p>14、大功告成</p>
+<p>15、Framework 的使用，创建一个 <code>Single View Application</code> ，命名 XHFrameworkUserDemo</p>
+<p>16、将 <code>XHFramework.framework</code> 拖入到新创建的项目中</p>
+<p><img src="https://i.loli.net/2020/06/12/yzOXYcMBALab5xD.png" alt=""></p>
+<p>17、在 <code>ViewController.m</code> 中引入头文件</p>
+<p><img src="https://i.loli.net/2020/06/12/WFLXn2CrB7f4pmd.png" alt=""></p>
+<p>18、Run，发现报错</p>
+<p><img src="https://i.loli.net/2020/06/12/WeAZp8GNEMOvUIz.png" alt=""></p>
+<p>19、解决方案：选择 <code>Build Phases</code>，点开 <code>Copy Files</code> ，如果没有需要添加；点击加号将 <code>XHFramework.framework</code> 文件添加到 <code>Copy Files</code> 中，并将 <code>Destination</code> 改为 <code>Frameworks</code></p>
+<p><img src="https://i.loli.net/2020/06/12/rZjH8toeJYOhDPw.png" alt=""></p>
+<p>20、然后一顿快捷操作 <code>Command + B</code> <code>Command + R</code> 真机测试成功</p>
+<p><img src="https://i.loli.net/2020/06/12/hLF2XM9oIvngj3N.png" alt=""></p>
+<p>常见问题：</p>
+<p><strong>Q、只有一种模拟器设备能运行，其他模拟器报错</strong><br>A、兼容全部设备解决方法：改下静态库的兼容属性。<code>Target：-&gt; Build Settings -&gt; Architectures -&gt; Build Active Architecture Only</code> 全改成 <code>NO</code>；<code>Build Active Architecture Only</code> 这个属性设置为 <code>yes</code>，是为了 DEBUG 的时候编译速度更快，它只编译当前的 architecture 版本，所以会报错编译不到文件，出错 <code>&quot;_OBJC_CLASS_$_xxxxxx&quot;, referenced from:</code> 而设置为 <code>no</code> 时，会编译所有的版本，这样就解决编译出错的问题了。<br>下面是设备对应的 architecture：<br>armv6：iPhone 2G/3G，iPod 1G/2G<br>armv7：iPhone 3GS/4/4s，iPod 3G/4G，iPad 1G/2G/3G<br>armv7s：iPhone5, iPod5<br>arm64：iPhone5s<br>编译出的版本是向下兼容的，比如你设置此值为 <code>yes</code>，用 iPhone 4 编译出来的是 <code>armv7</code> 版本的，iPhone 5 也可以运行，但是 <code>armv6</code> 的设备就不能运行。</p>
+<p><strong>Q、warning: embedded dylibs/frameworks only run on iOS 8 or later</strong><br>A、如 framework 设置支持 iOS 7 ，Build 时会发现有 <code>ld: warning: embedded dylibs/frameworks only run on iOS 8 or later</code> 警告，这是因为工程默认编译设置的是 <code>Dynamic Framework</code>。这种编译只有在 iOS 8 以后才能使用。动态库可以分开发布，在运行时查找并存入内存，但苹果只允许他自己用，到 iOS 8 以后才开放给开发者。因此，我需要将 <code>Dynamic Framework</code> 更换为 <code>Static Library</code> 静态模式。设置路径为 <code>Build Settings -&gt; Linking -&gt; Mach-O Type -&gt; Static Library</code></p>
+<p><strong>Q、framework 中使用 Category</strong><br>A、如果你用了 Category，别人在用你的 framework 时会发生崩溃。这时别人在引用时需要在工程中 <code>other linker flags</code> 中添加 <code>-objC</code> 如果依然有问题，再添加 <code>-all_load</code>。</p>
+<p><strong>Q、编译成功，但发现很多关于符号表的警告</strong><br>A、需要将 <code>Generate Debug Symbols</code> 设置为 NO 即可关闭符号表警告。</p>
+<p><strong>Q、支持 bitcode</strong><br>A、在 TAGETS 的 Build setting 中搜索 <code>Other C Flags</code>，添加命令 <code>-fembed-bitcode</code>。同样的设置在 PROJECT 中。如果不进行以上操作。别人在集成你的 framework 时可以编译，亦可以真机测试。唯独在打包时会发出警告并打包失败。警告为 framework 不支持 bitcode！</p>
+<p>Done <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Xcode/" rel="tag"># Xcode</a>
+              <a href="/tags/SDK/" rel="tag"># SDK</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2016/04/iOS%E4%BD%BF%E7%94%A8%E4%BC%81%E4%B8%9A%E8%AF%81%E4%B9%A6%E9%87%8D%E7%AD%BEipa%E5%8C%85/" rel="next" title="iOS使用企业证书重签ipa包">
+      iOS使用企业证书重签ipa包 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

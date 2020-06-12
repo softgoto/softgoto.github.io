@@ -23,7 +23,7 @@
 
   <meta name="description" content="前言ELK 到底是什么？下面引用官网的解释。  “ELK”是三个开源项目的首字母缩写，这三个项目分别是：Elasticsearch、Logstash 和 Kibana。Elasticsearch 是一个搜索和分析引擎。Logstash 是服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到诸如 Elasticsearch 等“存储库”中。Kibana 则可以让用户在 Ela">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ELK7.6.2部署教程">
+<meta property="og:title" content="ELK7.6.2 部署教程">
 <meta property="og:url" content="https://softgoto.github.io/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/index.html">
 <meta property="og:site_name" content="softgoto的个人博客">
 <meta property="og:description" content="前言ELK 到底是什么？下面引用官网的解释。  “ELK”是三个开源项目的首字母缩写，这三个项目分别是：Elasticsearch、Logstash 和 Kibana。Elasticsearch 是一个搜索和分析引擎。Logstash 是服务器端数据处理管道，能够同时从多个来源采集数据，转换数据，然后将数据发送到诸如 Elasticsearch 等“存储库”中。Kibana 则可以让用户在 Ela">
@@ -54,7 +54,7 @@
   };
 </script>
 
-  <title>ELK7.6.2部署教程 | softgoto的个人博客</title>
+  <title>ELK7.6.2 部署教程 | softgoto的个人博客</title>
   
 
 
@@ -188,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          ELK7.6.2部署教程
+          ELK7.6.2 部署教程
         </h1>
 
         <div class="post-meta">
@@ -237,7 +237,7 @@
 <p>附上一张 ELK 高可用的架构图，下面我们开始搭建 ELK</p>
 <a id="more"></a>
 
-<p><img src="https://i.loli.net/2020/05/06/Z6HVrS89DqPujlE.png" alt="Snipaste_2020-05-06_13-30-47.png"></p>
+<p><img src="https://i.loli.net/2020/05/06/Z6HVrS89DqPujlE.png" alt=""></p>
 <h3 id="Elasticsearch（单节点模式）"><a href="#Elasticsearch（单节点模式）" class="headerlink" title="Elasticsearch（单节点模式）"></a>Elasticsearch（单节点模式）</h3><h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><p>Elasticsearch 7.x 自带 OpenJDK11，可以指定 Oracle JDK，但版本必须在 1.8 及以上。在配置好 Java 环境之后，启动时会使用系统配置的 Java 环境。在安装 Elasticsearch 时，需要在服务器创建一个新的用户，因为 Elasticsearch 在启动时不支持 root 用户启动。</p>
 <h4 id="解压-amp-配置"><a href="#解压-amp-配置" class="headerlink" title="解压&amp;配置"></a>解压&amp;配置</h4><p>切换到新创建的用户并将安装文件 <code>elasticsearch-7.6.2-linux-x86_64.tar.gz</code> 上传到服务器，然后解压文件 &amp; 修改配置</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tar -xvf elasticsearch-7.6.2-linux-x86_64.tar.gz</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> elasticsearch-7.6.2/config</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> vim elasticsearch.yml</span></span><br></pre></td></tr></table></figure>
@@ -375,8 +375,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="prev" title="VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)">
-      <i class="fa fa-chevron-left"></i> VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)
+    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="prev" title="VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)">
+      <i class="fa fa-chevron-left"></i> VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)
     </a></div>
       <div class="post-nav-item"></div>
     </div>
@@ -453,7 +453,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -466,7 +466,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

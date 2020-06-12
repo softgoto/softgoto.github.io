@@ -23,7 +23,7 @@
 
   <meta name="description" content="记一下使用 yum 安装 mysql 的过程，环境：CentOS 7.2、MySQL5.7 配置 yum 源在 MySQL 官网中下载 yum 源 RPM 安装包：https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用yum安装Mysql5.7">
+<meta property="og:title" content="使用 yum 安装 Mysql5.7">
 <meta property="og:url" content="https://softgoto.github.io/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/index.html">
 <meta property="og:site_name" content="softgoto的个人博客">
 <meta property="og:description" content="记一下使用 yum 安装 mysql 的过程，环境：CentOS 7.2、MySQL5.7 配置 yum 源在 MySQL 官网中下载 yum 源 RPM 安装包：https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;">
@@ -55,7 +55,7 @@
   };
 </script>
 
-  <title>使用yum安装Mysql5.7 | softgoto的个人博客</title>
+  <title>使用 yum 安装 Mysql5.7 | softgoto的个人博客</title>
   
 
 
@@ -189,7 +189,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          使用yum安装Mysql5.7
+          使用 yum 安装 Mysql5.7
         </h1>
 
         <div class="post-meta">
@@ -233,7 +233,7 @@
 <h3 id="配置-yum-源"><a href="#配置-yum-源" class="headerlink" title="配置 yum 源"></a>配置 yum 源</h3><p>在 MySQL 官网中下载 yum 源 RPM 安装包：<a href="https://dev.mysql.com/downloads/repo/yum/" target="_blank" rel="noopener">https://dev.mysql.com/downloads/repo/yum/</a></p>
 <a id="more"></a>
 
-<p><img src="https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg" alt="006tKfTcgy1fee6zaqdyjj317z0b3tbh.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg" alt=""></p>
 <p>将 MySQL RPM 源的安装包下载到服务器</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> wget http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm</span></span><br></pre></td></tr></table></figure>
 
@@ -244,12 +244,12 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum repolist enabled | grep "mysql.*-community.*"</span><br></pre></td></tr></table></figure>
 
 <p>看到图这样就表示安装成功了</p>
-<p><img src="https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg" alt="006tKfTcgy1fee6zwdrbwj30ir02n3z6.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg" alt=""></p>
 <p>当然也可以选择 MySQL 版本来安装，编辑一下 MySQL RPM 源文件</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim /etc/yum.repos.d/mysql-community.repo</span></span><br></pre></td></tr></table></figure>
 
 <p>比如要安装 5.6 版本，将 5.7 源的 <code>enabled=1</code> 改成 <code>enabled=0</code>，然后再将 5.6 源的 <code>enabled=0</code> 改成 <code>enabled=1</code> 就可以了，改完之后的效果如下所示： </p>
-<p><img src="https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg" alt="006tKfTcgy1fee709xjjtj31kw0qt45k.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg" alt=""></p>
 <h3 id="安装-MySQL"><a href="#安装-MySQL" class="headerlink" title="安装 MySQL"></a>安装 MySQL</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> yum install mysql-community-server</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="启动-MySQL-服务"><a href="#启动-MySQL-服务" class="headerlink" title="启动 MySQL 服务"></a>启动 MySQL 服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> systemctl start mysqld</span></span><br></pre></td></tr></table></figure>
@@ -262,7 +262,7 @@
 <h3 id="MySQL-配置"><a href="#MySQL-配置" class="headerlink" title="MySQL 配置"></a>MySQL 配置</h3><p>安装完成之后，在 <code>/var/log/mysqld.log</code> 文件中给 MySQL root 用户生成了一个默认密码，通过下面的方式找到 root 默认密码，然后登录 MySQL 就能修改 root 密码了。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> grep <span class="string">'temporary password'</span> /var/<span class="built_in">log</span>/mysqld.log</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg" alt="006tKfTcgy1fee70irrwvj30n701k0t4.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg" alt=""></p>
 <p>登录 MySQL</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mysql -uroot -p</span></span><br></pre></td></tr></table></figure>
 
@@ -272,11 +272,11 @@
 <blockquote>
 <p>MySQL 5.7 默认安装了密码安全检查插件（validate_password），默认密码检查策略要求密码必须包含：大小写字母、数字和特殊符号，并且长度不能少于 8 位。否则会提示 ERROR 1819 (HY000): Your password does not satisfy the current policy requirements 错误，如下图所示： </p>
 </blockquote>
-<p><img src="https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg" alt="006tKfTcgy1fee711wtn4j30ig01h3yp.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg" alt=""></p>
 <p>我们可以通过 MySQL 环境变量查看密码策略的相关信息：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> show variables like <span class="string">'%password%'</span>;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg" alt="006tKfTcgy1fee71avgi3j30dg0a8ta6.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg" alt=""></p>
 <p>validate_password_policy：密码策略，默认为MEDIUM策略<br>validate_password_dictionary_file：密码策略文件，策略为STRONG才需要<br>validate_password_length：密码最少长度<br>validate_password_mixed_case_count：大小写字符长度，至少1个<br>validate_password_number_count ：数字至少1个<br>validate_password_special_char_count：特殊字符至少1个 </p>
 <p>上述参数是默认策略 MEDIUM 的密码检查规则，共有以下几种密码策略：</p>
 <table>
@@ -312,7 +312,7 @@
 <p>重新启动 MySQL 服务，检查一下数据库默认编码有没有修改成功</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> show variables like <span class="string">'%character%'</span>;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg" alt="006tKfTcgy1fee71fclrzj30dr07it9n.jpg"></p>
+<p><img src="https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg" alt=""></p>
 <h3 id="修改用户密码过期规则"><a href="#修改用户密码过期规则" class="headerlink" title="修改用户密码过期规则"></a>修改用户密码过期规则</h3><p>默认情况下密码超过 90 天就会提示要更换，当然我们可以设置密码过期规则</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> PASSWORD EXPIRE NEVER;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">mysql&gt;</span><span class="bash"> ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> PASSWORD EXPIRE INTERVAL 30 DAY;</span></span><br></pre></td></tr></table></figure>
 
@@ -336,12 +336,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" rel="prev" title="如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins">
-      <i class="fa fa-chevron-left"></i> 如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins
+    <a href="/2017/04/OpenSSH-%E8%BF%9C%E7%A8%8B%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2016-10010-%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88/" rel="prev" title="OpenSSH 远程权限提升漏洞(CVE-2016-10010)修复方案">
+      <i class="fa fa-chevron-left"></i> OpenSSH 远程权限提升漏洞(CVE-2016-10010)修复方案
     </a></div>
       <div class="post-nav-item">
-    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="next" title="VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)">
-      VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only) <i class="fa fa-chevron-right"></i>
+    <a href="/2017/06/Nginx%E8%BD%AC%E5%8F%91%E5%88%B0Tomcat%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96HTTPS%E5%92%8CHOST%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="Nginx转发到Tomcat之后获取HTTPS和HOST的问题">
+      Nginx转发到Tomcat之后获取HTTPS和HOST的问题 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -417,7 +417,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -430,7 +430,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

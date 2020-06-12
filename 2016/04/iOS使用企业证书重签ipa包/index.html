@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="iOS9 升级后众多企业分发的 APP 已经出现了不能安装的情况，而 iOS 8 或更早的系统不受影响。那是因为从 iOS 9 以后，系统会在 ipa 包下载完之后，拿 ipa 包中的 bundle ID 与 manifest.plist 中的 bundle ID 进行比对，不一致不允许安装。 所以现在重签时需要修改 ID，重签需要用到一个重签工具，我们先下载开源重签工具 iReSign，打开 i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS使用企业证书重签ipa包">
+<meta property="og:url" content="https://softgoto.github.io/2016/04/iOS%E4%BD%BF%E7%94%A8%E4%BC%81%E4%B8%9A%E8%AF%81%E4%B9%A6%E9%87%8D%E7%AD%BEipa%E5%8C%85/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="iOS9 升级后众多企业分发的 APP 已经出现了不能安装的情况，而 iOS 8 或更早的系统不受影响。那是因为从 iOS 9 以后，系统会在 ipa 包下载完之后，拿 ipa 包中的 bundle ID 与 manifest.plist 中的 bundle ID 进行比对，不一致不允许安装。 所以现在重签时需要修改 ID，重签需要用到一个重签工具，我们先下载开源重签工具 iReSign，打开 i">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/x5rCZ1FtSOcLA64.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/yaOHgrJ6fu5hPdl.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/06/12/juRE7sTUXt8I2QG.jpg">
+<meta property="article:published_time" content="2016-04-12T15:05:09.000Z">
+<meta property="article:modified_time" content="2016-04-12T15:05:09.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/06/12/x5rCZ1FtSOcLA64.jpg">
+
+<link rel="canonical" href="https://softgoto.github.io/2016/04/iOS%E4%BD%BF%E7%94%A8%E4%BC%81%E4%B8%9A%E8%AF%81%E4%B9%A6%E9%87%8D%E7%AD%BEipa%E5%8C%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>iOS使用企业证书重签ipa包 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2016/04/iOS%E4%BD%BF%E7%94%A8%E4%BC%81%E4%B8%9A%E8%AF%81%E4%B9%A6%E9%87%8D%E7%AD%BEipa%E5%8C%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS使用企业证书重签ipa包
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-04-12 15:05:09" itemprop="dateCreated datePublished" datetime="2016-04-12T15:05:09+00:00">2016-04-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>iOS9 升级后众多企业分发的 APP 已经出现了不能安装的情况，而 iOS 8 或更早的系统不受影响。那是因为从 iOS 9 以后，系统会在 ipa 包下载完之后，拿 ipa 包中的 <code>bundle ID</code> 与 <code>manifest.plist</code> 中的 <code>bundle ID</code> 进行比对，不一致不允许安装。</p>
+<p>所以现在重签时需要修改 ID，重签需要用到一个重签工具，我们先下载开源重签工具 <a href="https://github.com/maciekish/iReSign" target="_blank" rel="noopener">iReSign</a>，打开 <code>iReSign.app</code> 点击 <code>重新签名!</code> 按钮，成功后就会在原 ipa 包同目录下生成一个重签后的 ipa 包。建议将需要用到的 ipa、plist、profile 文件放在同一个文件夹内</p>
+<a id="more"></a>
+
+<h3 id="创建-App-ID"><a href="#创建-App-ID" class="headerlink" title="创建 App ID"></a>创建 App ID</h3><p>登录<a href="https://developer.apple.com/membercenter/index.action" target="_blank" rel="noopener">苹果开发者中心</a>，创建 <code>App ID</code></p>
+<p><img src="https://i.loli.net/2020/06/12/x5rCZ1FtSOcLA64.jpg" alt=""></p>
+<h3 id="创建-Profile-文件"><a href="#创建-Profile-文件" class="headerlink" title="创建 Profile 文件"></a>创建 Profile 文件</h3><p>为上面创建的 <code>App ID</code> 创建一个 <code>iOS Provisioning Profiles(Distribution)</code> 并下载到本地（可以通过 Xcode 来创建）</p>
+<p><img src="https://i.loli.net/2020/06/12/yaOHgrJ6fu5hPdl.jpg" alt=""></p>
+<h3 id="新建-entitlements-plist-文件"><a href="#新建-entitlements-plist-文件" class="headerlink" title="新建 entitlements.plist 文件"></a>新建 entitlements.plist 文件</h3><p>创建 <code>entitlements.plist</code> 文件，内容如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">plist</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">"-//Apple//DTD PLIST 1.0//EN"</span> <span class="meta-string">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>application-identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">string</span>&gt;</span>PREFIX.yourappBundleID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>aps-environment<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">string</span>&gt;</span>production<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>get-task-allow<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">false</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">key</span>&gt;</span>keychain-access-groups<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">string</span>&gt;</span>PREFIX.yourappBundleID<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>将其中的 <code>PREFIX.yourappBundleID</code> 替换为第一步截图中的 <code>Prefix</code> 和 <code>ID</code>。该文件中内容配置可以参考<a href="https://objccn.io/issue-17-2/" target="_blank" rel="noopener">代码签名探析</a>，比如没有推送功能的话，就去掉如下两行：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>aps-environment<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">string</span>&gt;</span>production<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="重签"><a href="#重签" class="headerlink" title="重签"></a>重签</h3><p>打开<code>iReSign</code></p>
+<p><img src="https://i.loli.net/2020/06/12/juRE7sTUXt8I2QG.jpg" alt=""></p>
+<ul>
+<li>需要重签 ipa 的存放路径</li>
+<li>在第 2 步中下载的 <code>Provisioning Profiles</code> 文件存放路径</li>
+<li>在第 3 步中创建的 <code>entitlements.plist</code> 文件存放路径</li>
+<li>勾选 <code>修改ID</code>，然后填写第 1 步中的 <code>ID</code></li>
+<li>选择重签使用的证书</li>
+</ul>
+<p>点击 <code>重新签名!</code>，如果没有报错，恭喜你，重签成功！如果失败请仔细检查 <code>App ID</code>、<code>Profile</code>、<code>plist</code> 文件、证书信息是否正确。</p>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>找个 HTTPS 环境通过苹果的 <code>itms-services</code> 协议来安装，<code>manifest.plist</code> 文件的参考配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">plist</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">"-//Apple//DTD PLIST 1.0//EN"</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">"http://www.apple.com/DTDs/PropertyList-1.0.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">plist</span> <span class="attr">version</span>=<span class="string">"1.0"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- array of downloads. --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">key</span>&gt;</span>items<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">          <span class="comment">&lt;!-- an array of assets to download --&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">key</span>&gt;</span>assets<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- software-package: the ipa to install. --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- required.  the asset kind. --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>kind<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>software-package<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- optional.  md5 every n bytes.  --&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- will restart a chunk if md5 fails. --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>md5-size<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">integer</span>&gt;</span>10485760<span class="tag">&lt;/<span class="name">integer</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- optional.  array of md5 hashes --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>md5s<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">string</span>&gt;</span>41fa64bb7a7cae5a46bfb45821ac8bba<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                      <span class="tag">&lt;<span class="name">string</span>&gt;</span>51fa64bb7a7cae5a46bfb45821ac8bba<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- required.  the URL of the file to download. --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>url<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://www.example.com/apps/foo.ipa<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- display-image: the icon to display during download. --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>kind<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>display-image<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- optional. icon needs shine effect applied. --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>needs-shine<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>url<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://www.example.com/image.57×57.png<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- full-size-image: the large 512×512 icon used by iTunes. --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>kind<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>full-size-image<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                  <span class="comment">&lt;!-- optional.  one md5 hash for the entire file. --&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>md5<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>61fa64bb7a7cae5a46bfb45821ac8bba<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>needs-shine<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">key</span>&gt;</span>url<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">                  <span class="tag">&lt;<span class="name">string</span>&gt;</span>http://www.example.com/image.512×512.jpg<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">array</span>&gt;</span><span class="tag">&lt;<span class="name">key</span>&gt;</span>metadata<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- required --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">key</span>&gt;</span>bundle-identifier<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">string</span>&gt;</span>com.example.fooapp<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- optional (software only) --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">key</span>&gt;</span>bundle-version<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">string</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- required.  the download kind. --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">key</span>&gt;</span>kind<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">string</span>&gt;</span>software<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- optional. displayed during download; --&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- typically company name --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">key</span>&gt;</span>subtitle<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">string</span>&gt;</span>Apple<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">              <span class="comment">&lt;!-- required.  the title to display during the download. --&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">key</span>&gt;</span>title<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">              <span class="tag">&lt;<span class="name">string</span>&gt;</span>Example Corporate App<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">plist</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>Done. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/03/iOS-%E5%A6%82%E4%BD%95%E5%B0%81%E8%A3%85-SDK-%E6%8F%90%E4%BE%9B%E7%BB%99%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BC%80%E5%8F%91%E8%80%85/" rel="prev" title="iOS 如何封装 SDK 提供给第三方开发者">
+      <i class="fa fa-chevron-left"></i> iOS 如何封装 SDK 提供给第三方开发者
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/03/%E9%98%BF%E9%87%8C%E4%BA%91OSS%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90%E5%92%8C%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88/" rel="next" title="阿里云 OSS 对象存储数据安全问题分析和技术方案">
+      阿里云 OSS 对象存储数据安全问题分析和技术方案 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-App-ID"><span class="nav-number">1.</span> <span class="nav-text">创建 App ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Profile-文件"><span class="nav-number">2.</span> <span class="nav-text">创建 Profile 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建-entitlements-plist-文件"><span class="nav-number">3.</span> <span class="nav-text">新建 entitlements.plist 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重签"><span class="nav-number">4.</span> <span class="nav-text">重签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证"><span class="nav-number">5.</span> <span class="nav-text">验证</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

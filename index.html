@@ -176,7 +176,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">ELK7.6.2部署教程</a>
+            <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" class="post-title-link" itemprop="url">ELK7.6.2 部署教程</a>
         </h2>
 
         <div class="post-meta">
@@ -256,7 +256,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" class="post-title-link" itemprop="url">VirtualBox虚拟机配置CentOS7网络(NAT Network + Host-Only)</a>
+            <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" class="post-title-link" itemprop="url">VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)</a>
         </h2>
 
         <div class="post-meta">
@@ -326,6 +326,322 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/" class="post-title-link" itemprop="url">Amazon S3 SSE-C方案示例</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-05-03 17:36:06" itemprop="dateCreated datePublished" datetime="2018-05-03T17:36:06+00:00">2018-05-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><p>Mac OS<br>JDK1.7<br>Eclipse</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>亚马逊云分国内亚马逊云存储(<a href="https://www.amazonaws.cn/" target="_blank" rel="noopener">AWS中国</a>)和国外亚马逊云存储(<a href="https://aws.amazon.com" target="_blank" rel="noopener">AWS全球</a>)，这两套账号是独立的，在注册账号时需要留意。国内的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，整个过程网络速度没有优化，按照实际的网络速度上传。国外的亚马逊云存储：基本下载、分段下载、基本上传、分段上传这4个功能，还有额外的收费一个功能，加速下载和加速上传；整个过程会充分利用网络资源提高数据传输速度。</p>
+<p>国内的亚马逊云存储加密功能是没有阉割的，国内上传文件到国内亚马逊云存储，上传速度平均是 540K/s ，高峰时段速度会降低。国内上传文件到国外亚马逊云存储，上传速度是 62k/s ，没有使用加速功能。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/05/Amazon-S3-SSE-C%E6%96%B9%E6%A1%88%E7%A4%BA%E4%BE%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2018/04/CentOS-7%E9%85%8D%E7%BD%AESSH-Key%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/04/CentOS-7%E9%85%8D%E7%BD%AESSH-Key%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">CentOS 7配置SSH Key实现免密登录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-04-10 15:39:57" itemprop="dateCreated datePublished" datetime="2018-04-10T15:39:57+00:00">2018-04-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="SSH"><a href="#SSH" class="headerlink" title="SSH"></a>SSH</h3><p>简单的说，SSH 是一种网络协议，用于计算机之间的加密登录。整个过程是这样的。</p>
+<ul>
+<li>远程主机收到用户的登录请求，把自己的公钥发给用户。</li>
+<li>用户使用这个公钥，将登录密码加密之后，发送回来。</li>
+<li>远程主机用自己的私钥，解密登录密码。如果密码正确，就同意用户登录。</li>
+</ul>
+<h3 id="SSH-Key-公钥登录"><a href="#SSH-Key-公钥登录" class="headerlink" title="SSH Key 公钥登录"></a>SSH Key 公钥登录</h3><p>使用密码登录，每次都必须输入密码，非常麻烦。好在 SSH 还提供了公钥登录，可以省去输入密码的步骤。</p>
+<p>所谓 “公钥登录”，原理很简单，就是用户将自己的公钥存在远程主机上。登录的时候，远程主机会向用户发送一段随机字符串，用户用自己的私钥加密后，再发回来。远程主机用事先存储的公钥进行解密，如果成功，就证明用户是可信的，直接允许登录 shell，不再要求密码。这种方法要求用户必须提供自己的公钥。</p>
+<p>远程主机将用户的公钥，保存在登录后的用户主目录的 <code>$HOME/.ssh/authorized_keys</code> 文件中。公钥是一段字符串，只要把它追加在 <code>authorized_keys</code> 文件的末尾就可以了。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/04/CentOS-7%E9%85%8D%E7%BD%AESSH-Key%E5%AE%9E%E7%8E%B0%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2018/03/NFS%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/03/NFS%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">NFS安装配置和使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-03-22 17:11:41" itemprop="dateCreated datePublished" datetime="2018-03-22T17:11:41+00:00">2018-03-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-05-10 10:20:11" itemprop="dateModified" datetime="2019-05-10T10:20:11+00:00">2019-05-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="NFS-服务介绍"><a href="#NFS-服务介绍" class="headerlink" title="NFS 服务介绍"></a>NFS 服务介绍</h2><p>NFS 是 Network File System 的缩写，即网络文件系统。一种使用于分散式文件系统的协定，由 Sun 公司开发，于1984年向外公布。功能是通过网络让不同的机器、不同的操作系统能够彼此分享个别的数据，让应用程序在客户端通过网络访问位于服务器磁盘中的数据，是在类 Unix 系统间实现磁盘文件共享的一种方法。</p>
+<p>NFS 的基本原则是“容许不同的客户端及服务端通过一组 RPC 分享相同的文件系统”，它是独立于操作系统，容许不同硬件及操作系统的系统共同进行文件的分享。</p>
+<p>NFS 在文件传送或信息传送过程中依赖于 RPC 协议。RPC 远程过程调用 (Remote Procedure Call) 是能使客户端执行其他系统中程序的一种机制。NFS 本身是没有提供信息传输的协议和功能的，但 NFS 却能让我们通过网络进行资料的分享，这是因为 NFS 使用了一些其它的传输协议。而这些传输协议用到这个 RPC 功能的。可以说 NFS 本身就是使用RPC的一个程序。或者说 NFS 也是一个 RPC SERVER。所以只要用到 NFS 的地方都要启动 RPC 服务，不论是 NFS SERVER 或者 NFS CLIENT。这样 SERVER 和 CLIENT 才能通过 RPC 来实现 PROGRAM PORT 的对应。可以这么理解 RPC 和 NFS 的关系：NFS 是一个文件系统，而 RPC 是负责负责信息的传输。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/03/NFS%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/06/Nginx%E8%BD%AC%E5%8F%91%E5%88%B0Tomcat%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96HTTPS%E5%92%8CHOST%E7%9A%84%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/06/Nginx%E8%BD%AC%E5%8F%91%E5%88%B0Tomcat%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96HTTPS%E5%92%8CHOST%E7%9A%84%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">Nginx转发到Tomcat之后获取HTTPS和HOST的问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-06-26 14:32:00" itemprop="dateCreated datePublished" datetime="2017-06-26T14:32:00+00:00">2017-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>问题是在 Nginx 配置完 SSL 证书之后，跑在 Tomcat 中的应用不能获取前端用户真实的 IP 和 HTTPS 头，我们需要在 Nginx 和 Tomcat 都加上以下配置。</p>
+<h3 id="Nginx配置"><a href="#Nginx配置" class="headerlink" title="Nginx配置"></a>Nginx配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header            X-Real-IP           $remote_addr;</span><br><span class="line">proxy_set_header            REMOTE-HOST         $remote_addr;</span><br><span class="line">proxy_set_header            Host                $host;</span><br><span class="line">proxy_set_header            X-Forwarded-For     $proxy_add_x_forwarded_for;</span><br><span class="line">proxy_set_header            X-Forwarded-Proto   $scheme;</span><br><span class="line">proxy_pass_request_headers                      on;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/06/Nginx%E8%BD%AC%E5%8F%91%E5%88%B0Tomcat%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96HTTPS%E5%92%8CHOST%E7%9A%84%E9%97%AE%E9%A2%98/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -340,7 +656,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/" class="post-title-link" itemprop="url">使用yum安装Mysql5.7</a>
+            <a href="/2017/04/%E4%BD%BF%E7%94%A8yum%E5%AE%89%E8%A3%85Mysql5-7/" class="post-title-link" itemprop="url">使用 yum 安装 Mysql5.7</a>
         </h2>
 
         <div class="post-meta">
@@ -401,6 +717,163 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/04/OpenSSH-%E8%BF%9C%E7%A8%8B%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2016-10010-%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/04/OpenSSH-%E8%BF%9C%E7%A8%8B%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2016-10010-%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88/" class="post-title-link" itemprop="url">OpenSSH 远程权限提升漏洞(CVE-2016-10010)修复方案</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-04-06 14:12:51" itemprop="dateCreated datePublished" datetime="2017-04-06T14:12:51+00:00">2017-04-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在升级之前需要先给服务器做好快照和备份，防止意外导致数据丢失。</p>
+<p>使用 rpm 命令检查依赖包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> rpm -qa|grep zlib</span></span><br></pre></td></tr></table></figure>
+
+<p>删除 rpm 包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> rpm -e --nodeps zlib</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/04/OpenSSH-%E8%BF%9C%E7%A8%8B%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2016-10010-%E4%BF%AE%E5%A4%8D%E6%96%B9%E6%A1%88/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/04/Docker-%E6%90%AD%E5%BB%BANexus-OSS3%E7%A7%81%E6%9C%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2017/04/Docker-%E6%90%AD%E5%BB%BANexus-OSS3%E7%A7%81%E6%9C%8D/" class="post-title-link" itemprop="url">Docker 搭建Nexus OSS3私服</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-04-01 15:26:59" itemprop="dateCreated datePublished" datetime="2017-04-01T15:26:59+00:00">2017-04-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Docker安装"><a href="#Docker安装" class="headerlink" title="Docker安装"></a>Docker安装</h3><p>Docker 安装可以<a href="https://softgoto.github.io/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/#more">参考这里</a></p>
+<h3 id="Nexus介绍"><a href="#Nexus介绍" class="headerlink" title="Nexus介绍"></a>Nexus介绍</h3><p>Nexus 是个仓库管理器，目前主要分 2 大版本：2.X 和 3.X，其中 2.X 主要支持的格式是 Maven、P2、OBR、Yum。3.X 主要支持的是 Docker、NuGet、npm、Bower、Pypi、Ruby Gems，当然也支持构建工具 Maven 和 Gradle。Nexus 3 只支持 Oracle jdk8，不支持其它版本的 JDK，比如 OpenJDK。</p>
+<h3 id="Nexus安装"><a href="#Nexus安装" class="headerlink" title="Nexus安装"></a>Nexus安装</h3><p>本次安装的 Nexus OSS 版本是 3.2.1</p>
+<p>镜像地址：<a href="https://github.com/sonatype/docker-nexus3" target="_blank" rel="noopener">docker-nexus3</a></p>
+<p>使用 Docker 安装就很简单了，三步搞定</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2017/04/Docker-%E6%90%AD%E5%BB%BANexus-OSS3%E7%A7%81%E6%9C%8D/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -415,7 +888,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" class="post-title-link" itemprop="url">如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins</a>
+            <a href="/2017/03/%E5%A6%82%E4%BD%95%E5%9C%A8CentOS-7%E4%B8%8A%E9%80%9A%E8%BF%87Docker%E7%9A%84%E6%96%B9%E5%BC%8F%E5%AE%89%E8%A3%85Gitlab%E5%92%8CJenkins/" class="post-title-link" itemprop="url">如何在 CentOS 7 上通过 Docker 的方式安装 Gitlab 和 Jenkins</a>
         </h2>
 
         <div class="post-meta">
@@ -480,6 +953,9 @@
 
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+  </nav>
 
 
 
@@ -546,7 +1022,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -559,7 +1035,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
