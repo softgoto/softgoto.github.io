@@ -1,5 +1,5 @@
 ---
-title: 使用yum安装Mysql5.7
+title: 使用 yum 安装 Mysql5.7
 date: 2017-04-08 18:28:39
 categories: 技术类
 tags:
@@ -14,7 +14,7 @@ tags:
 
 <!--more-->
 
-![006tKfTcgy1fee6zaqdyjj317z0b3tbh.jpg](https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg)
+![](https://i.loli.net/2020/06/11/qxSvHGLRf48hr1Y.jpg)
 
 将 MySQL RPM 源的安装包下载到服务器
 
@@ -36,7 +36,7 @@ yum repolist enabled | grep "mysql.*-community.*"
 
 看到图这样就表示安装成功了
 
-![006tKfTcgy1fee6zwdrbwj30ir02n3z6.jpg](https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg)
+![](https://i.loli.net/2020/06/11/ctJ3iH5Cfu71ROF.jpg)
 
 当然也可以选择 MySQL 版本来安装，编辑一下 MySQL RPM 源文件
 
@@ -46,7 +46,7 @@ $ vim /etc/yum.repos.d/mysql-community.repo
 
 比如要安装 5.6 版本，将 5.7 源的 `enabled=1` 改成 `enabled=0`，然后再将 5.6 源的 `enabled=0` 改成 `enabled=1` 就可以了，改完之后的效果如下所示： 
 
-![006tKfTcgy1fee709xjjtj31kw0qt45k.jpg](https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg)
+![](https://i.loli.net/2020/06/11/Y8v3hlPFGe2zXuK.jpg)
 
 ### 安装 MySQL
 
@@ -81,7 +81,7 @@ $ systemctl daemon-reload
 $ grep 'temporary password' /var/log/mysqld.log
 ```
 
-![006tKfTcgy1fee70irrwvj30n701k0t4.jpg](https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg)
+![](https://i.loli.net/2020/06/11/Cx6udDtUyn8Eiao.jpg)
 
 登录 MySQL
 
@@ -99,7 +99,7 @@ mysql> set password for 'root'@'localhost'=password('密码');
 
 > MySQL 5.7 默认安装了密码安全检查插件（validate_password），默认密码检查策略要求密码必须包含：大小写字母、数字和特殊符号，并且长度不能少于 8 位。否则会提示 ERROR 1819 (HY000): Your password does not satisfy the current policy requirements 错误，如下图所示： 
 
-![006tKfTcgy1fee711wtn4j30ig01h3yp.jpg](https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg)
+![](https://i.loli.net/2020/06/11/tynpgrMWEFechQ8.jpg)
 
 我们可以通过 MySQL 环境变量查看密码策略的相关信息：
 
@@ -107,7 +107,7 @@ mysql> set password for 'root'@'localhost'=password('密码');
 mysql> show variables like '%password%';
 ```
 
-![006tKfTcgy1fee71avgi3j30dg0a8ta6.jpg](https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg)
+![](https://i.loli.net/2020/06/11/SEeUYlRjTc1wxZo.jpg)
 
 validate_password_policy：密码策略，默认为MEDIUM策略 
 validate_password_dictionary_file：密码策略文件，策略为STRONG才需要 
@@ -156,7 +156,7 @@ init_connect='SET NAMES utf8'
 mysql> show variables like '%character%';
 ```
 
-![006tKfTcgy1fee71fclrzj30dr07it9n.jpg](https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg)
+![](https://i.loli.net/2020/06/11/ucBKRAdpUGmen5N.jpg)
 
 ### 修改用户密码过期规则
 

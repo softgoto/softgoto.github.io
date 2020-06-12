@@ -1,5 +1,5 @@
 ---
-title: 如何在CentOS 7上通过Docker的方式安装Gitlab和Jenkins
+title: 如何在 CentOS 7 上通过 Docker 的方式安装 Gitlab 和 Jenkins
 date: 2017-03-30 15:35:17
 categories: 技术类
 tags:
