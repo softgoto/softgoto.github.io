@@ -108,3 +108,9 @@ emoji:
   className: github-emoji
   styles:
   customEmojis:
+
+# SiteMap
+sitemap:
+  path: sitemap.xml
+baidusitemap:
+  path: baidusitemap.xml
