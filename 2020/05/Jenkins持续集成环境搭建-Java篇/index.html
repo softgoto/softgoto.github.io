@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言持续集成（Continuous integration）是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布 ，自动化测试）来验证，从而尽早地发现集成错误。 这一篇介绍一下如何使用 Jenkins 来完成 Java 项目的持续集成。 macOS Sierra 10.12.1版本控制：SV">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins持续集成环境搭建-Java篇">
+<meta property="og:url" content="https://softgoto.github.io/2020/05/Jenkins%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Java%E7%AF%87/index.html">
+<meta property="og:site_name" content="softgoto的个人博客">
+<meta property="og:description" content="前言持续集成（Continuous integration）是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布 ，自动化测试）来验证，从而尽早地发现集成错误。 这一篇介绍一下如何使用 Jenkins 来完成 Java 项目的持续集成。 macOS Sierra 10.12.1版本控制：SV">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/146YamhsEI7bdok.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/TWz7RsOCSHI8p9f.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/rYt9h2MUvRC3pq8.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/sZ1RYXhlVLCaW72.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/LGfOb46kd9nIPey.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/imbPHDUqFat7MKA.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/97mDtBPvX4oWNy6.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/lbBxsweiuvEjWn7.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/BK75EgXeFHfajlS.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/45hl86aGNEWAgRj.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/15/VudqUpehlxa2wY8.png">
+<meta property="article:published_time" content="2020-05-12T17:58:31.000Z">
+<meta property="article:modified_time" content="2020-05-12T17:58:31.000Z">
+<meta property="article:author" content="softgoto">
+<meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="CI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/06/15/146YamhsEI7bdok.png">
+
+<link rel="canonical" href="https://softgoto.github.io/2020/05/Jenkins%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Java%E7%AF%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Jenkins持续集成环境搭建-Java篇 | softgoto的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">softgoto的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">一位不知名的技术人</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://softgoto.github.io/2020/05/Jenkins%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA-Java%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="softgoto">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="softgoto的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jenkins持续集成环境搭建-Java篇
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-12 17:58:31" itemprop="dateCreated datePublished" datetime="2020-05-12T17:58:31+00:00">2020-05-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E7%B1%BB/" itemprop="url" rel="index"><span itemprop="name">技术类</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>持续集成（Continuous integration）是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。每次集成都通过自动化的构建（包括编译，发布 ，自动化测试）来验证，从而尽早地发现集成错误。</p>
+<p>这一篇介绍一下如何使用 Jenkins 来完成 Java 项目的持续集成。</p>
+<p>macOS Sierra 10.12.1<br>版本控制：SVN<br>Jenkins 2.34<br>Apache Maven 3.3.9<br>JDK 1.7<br>Apache Tomcat 7</p>
+<p>在开始之前先说一下项目情况：<br>Java 后台代码通过 Maven 管理库，其中需要依赖另外一个通过 Maven 管理的 Java 工程， Web 前端使用 Vue 框架和后台代码独立存放，在部署时需要将 Web 前端文件复制到后台代码的 WAR 包中。</p>
+<a id="more"></a>
+
+
+<h2 id="第一步-创建项目"><a href="#第一步-创建项目" class="headerlink" title="第一步 创建项目"></a>第一步 创建项目</h2><p>因为项目依赖Maven管理，所以这里需要创建一个Maven项目</p>
+<p><img src="https://i.loli.net/2020/06/15/146YamhsEI7bdok.png" alt=""></p>
+<h2 id="第二步-Global-Tool-Configuration"><a href="#第二步-Global-Tool-Configuration" class="headerlink" title="第二步 Global Tool Configuration"></a>第二步 Global Tool Configuration</h2><p>配置 Jenkins 的 Maven 和 JDK 环境：Jenkins -&gt; 系统管理 -&gt; Global Tool Configuration</p>
+<p>因为用的是系统自带的 JDK ，所以地址为 <code>/Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home</code></p>
+<p><img src="https://i.loli.net/2020/06/15/TWz7RsOCSHI8p9f.png" alt=""></p>
+<p>如果是另外安装的 JDK ，可以打开设置，点击左下角的 Java</p>
+<p><img src="https://i.loli.net/2020/06/15/rYt9h2MUvRC3pq8.png" alt=""></p>
+<p><img src="https://i.loli.net/2020/06/15/sZ1RYXhlVLCaW72.png" alt=""></p>
+<p><img src="https://i.loli.net/2020/06/15/LGfOb46kd9nIPey.png" alt=""></p>
+<p>找到 Java 的路径，<code>MAVEN_HOME</code> 为 Maven 安装路径</p>
+<p><img src="https://i.loli.net/2020/06/15/imbPHDUqFat7MKA.png" alt=""></p>
+<h2 id="第三步-源码管理"><a href="#第三步-源码管理" class="headerlink" title="第三步 源码管理"></a>第三步 源码管理</h2><p><img src="https://i.loli.net/2020/06/15/97mDtBPvX4oWNy6.png" alt=""></p>
+<h2 id="第四步-Build"><a href="#第四步-Build" class="headerlink" title="第四步 Build"></a>第四步 Build</h2><p><code>Root POM</code> 这里需要指定 <code>pom.xml</code> 文件的路径，需要根据实际情况来调整，<code>${WORKSPACE}/xxxx/pom.xml</code>。以当前 Demo 为例，<code>/Users/You name/.jenkins/workspace</code> 目录结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Demo-Server</span><br><span class="line">    |---A                    &#x2F;&#x2F;后台工程</span><br><span class="line">        |---src              &#x2F;&#x2F;后台代码</span><br><span class="line">        |---pom.xml          &#x2F;&#x2F;Maven pom文件</span><br><span class="line">        |---... ...</span><br><span class="line">    |---A-View               &#x2F;&#x2F;Web前端代码</span><br><span class="line">        |---... ...</span><br></pre></td></tr></table></figure>
+
+<p>所以我这里 <code>Root POM</code> 就填 <code>A/pom.xml</code></p>
+<p><img src="https://i.loli.net/2020/06/15/lbBxsweiuvEjWn7.png" alt=""></p>
+<p>到这里就完了，点击 <code>Apply</code> <code>保存</code>，然后点击 <code>立即构建</code></p>
+<p><img src="https://i.loli.net/2020/06/15/BK75EgXeFHfajlS.png" alt=""></p>
+<p>如果只是单纯的通过 Maven 管理的项目，不和其他项目依赖，理论上到这里就结束了，Jenkins 自动编译打包完成，拿到 WAR 包手动部署到服务器。Good job! <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>但是，我这里却编译失败，错误是找不到xxx依赖工程，前面已经交代过项目情况了，对于我这个项目，还有三件事没有完成：</p>
+<p>1、有通过 Maven 依赖另外一个项目<br>2、Web 前端代码需要手动编译，并且需要复制到后台代码的 WAR 包中<br>3、自动部署</p>
+<p>OK，那一个一个来解决。</p>
+<h3 id="1、添加依赖项目"><a href="#1、添加依赖项目" class="headerlink" title="1、添加依赖项目"></a>1、添加依赖项目</h3><p>首先依赖的问题，我的方案是通过 Jenkins 来管理依赖项目，先 Build 依赖项目，再 Build Demo-Server。操作和上面一样，先创建项目，然后管理源码，配置 POM 文件，最后 Build ，搞定。依赖项目 Build 成功后，会将项目打包成 jar 包放到 Maven 本地库中。在依赖项目编译成功后，再去编译 Demo-Server 项目，就 OK 了。</p>
+<h3 id="2、Web-前端代码编译，移动"><a href="#2、Web-前端代码编译，移动" class="headerlink" title="2、Web 前端代码编译，移动"></a>2、Web 前端代码编译，移动</h3><p>前端使用 Vue 框架，编译需要使用 npm 命令。关于 Node.js 和 npm 请自行 Google。前面编译 Demo-Server 已经生成了一个 WAR 包，现在需要先解压 WAR，然后将编译好的前端代码 copy 进去，最后压缩生成新的 WAR。我们打开 Demo-Server 的配置页，在 Build 下面 <code>Add post-build step</code> 选择 <code>Execute shell</code>。记得上面需要勾选 <code>Run only if build succeeds</code>，因为只有当项目Build成功后才能去执行下一步操作</p>
+<p><img src="https://i.loli.net/2020/06/15/45hl86aGNEWAgRj.png" alt=""></p>
+<p><code>Command</code> 中填写 shell 脚本代码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">echo "**************************************"</span><br><span class="line">echo "softgoto"</span><br><span class="line">echo "----------------"</span><br><span class="line">echo "描述："</span><br><span class="line">echo "1、解压war包"</span><br><span class="line">echo "2、编译前端Vue代码"</span><br><span class="line">echo "3、将前端编译成功的代码复制到后台代码目录"</span><br><span class="line">echo "4、将后台和前端代码整合打包war"</span><br><span class="line">echo "**************************************"</span><br><span class="line"></span><br><span class="line">WAR_PATH="$&#123;WORKSPACE&#125;/A/target"</span><br><span class="line">A_VIEW_PATH="$&#123;WORKSPACE&#125;/A-view"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">解压</span></span><br><span class="line">cd $&#123;WAR_PATH&#125;</span><br><span class="line">unzip A.war -d A_jenkins_temp/</span><br><span class="line">rm -rf A.war</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">编译前端代码</span></span><br><span class="line">cd $&#123;A_VIEW_PATH&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">第一次需要执行npm i安装相关依赖</span></span><br><span class="line"><span class="meta">#</span><span class="bash">npm i</span></span><br><span class="line">npm run build</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">移动前端代码</span></span><br><span class="line">cp -r $&#123;A_VIEW_PATH&#125;/dist/* $&#123;WAR_PATH&#125;/A_jenkins_temp/</span><br><span class="line">cd $&#123;WAR_PATH&#125;/A_jenkins_temp/</span><br><span class="line">zip -r A.war ./</span><br><span class="line">mv A.war ../</span><br><span class="line">cd $&#123;WAR_PATH&#125;</span><br><span class="line">rm -rf A_jenkins_temp/</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>脚本经供参考，实际业务需要根据项目实际情况来修改脚本</p>
+</blockquote>
+<h3 id="3、自动部署"><a href="#3、自动部署" class="headerlink" title="3、自动部署"></a>3、自动部署</h3><p>自动部署需要安装插件Deploy</p>
+<blockquote>
+<p>插件安装：Jenkins -&gt; 系统管理 -&gt; 管理插件 -&gt; 可选插件，右上角过滤，输入Deploy，勾选 Deploy to Websphere container Plugin 安装并重启</p>
+</blockquote>
+<p>插件安装成功后，选择 Demo-Server -&gt; 配置 -&gt; 构建后操作 -&gt; 增加构建后操作步骤 选择 <code>Deploy war/ear to a container</code></p>
+<p><img src="https://i.loli.net/2020/06/15/VudqUpehlxa2wY8.png" alt=""></p>
+<p>保存，构建，完成</p>
+<p>注意事项：<br>1、上图 WAR 包文件地址请填写正确<br>2、Tomcat 下 webapps 目录下的 manager、host-manager、ROOT 文件夹不要删除，如果删除会导致 Deploy 插件不能上传 WAR 到 Tomcat 中<br>3、Tomcat 管理员账号配置在 conf 目录下的 <code>tomcat-users.xml</code> 文件，配置方式如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"tomcat"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"role1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-script"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-gui"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"manager-status"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"admin-gui"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">role</span> <span class="attr">rolename</span>=<span class="string">"admin-script"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">username</span>=<span class="string">"tomcat"</span> <span class="attr">password</span>=<span class="string">"tomcat"</span> <span class="attr">roles</span>=<span class="string">"manager-gui,manager-script,tomcat,admin-gui,admin-script"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>4、Deploy 报内存问题，需要修改 JVM 内存设置，Tomcat 的 bin 下 <code>catalina.sh</code>，在 <code>cygwin=false</code> 上一行添加下面的代码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_OPTS="-Xms512m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=256m"</span><br></pre></td></tr></table></figure>
+
+
+<p>Done. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+              <a href="/tags/CI/" rel="tag"># CI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/VirtualBox%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%85%8D%E7%BD%AECentOS7%E7%BD%91%E7%BB%9C-NAT-Network-Host-Only/" rel="prev" title="VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)">
+      <i class="fa fa-chevron-left"></i> VirtualBox 虚拟机配置 CentOS7 网络(NAT Network + Host-Only)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/ELK7-6-2%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/" rel="next" title="ELK7.6.2 部署教程">
+      ELK7.6.2 部署教程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一步-创建项目"><span class="nav-number">2.</span> <span class="nav-text">第一步 创建项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二步-Global-Tool-Configuration"><span class="nav-number">3.</span> <span class="nav-text">第二步 Global Tool Configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三步-源码管理"><span class="nav-number">4.</span> <span class="nav-text">第三步 源码管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第四步-Build"><span class="nav-number">5.</span> <span class="nav-text">第四步 Build</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">6.</span> <span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、添加依赖项目"><span class="nav-number">6.1.</span> <span class="nav-text">1、添加依赖项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、Web-前端代码编译，移动"><span class="nav-number">6.2.</span> <span class="nav-text">2、Web 前端代码编译，移动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、自动部署"><span class="nav-number">6.3.</span> <span class="nav-text">3、自动部署</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="softgoto"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">softgoto</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">softgoto</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
