@@ -4,21 +4,21 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next-3.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next-3.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next-3.png">
+  <link rel="mask-icon" href="/images/logo-3.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
 
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Glow Sans:300,300italic,400,400italic,700,700italic|Source Code Pro:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"softgoto.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="问题是在 Nginx 配置完 SSL 证书之后，跑在 Tomcat 中的应用不能获取前端用户真实的 IP 和 HTTPS 头，我们需要在 Nginx 和 Tomcat 都加上以下配置。 Nginx配置123456proxy_set_header            X-Real-IP           $remote_addr;proxy_set_header            REMOT">
@@ -29,7 +29,7 @@
 <meta property="og:description" content="问题是在 Nginx 配置完 SSL 证书之后，跑在 Tomcat 中的应用不能获取前端用户真实的 IP 和 HTTPS 头，我们需要在 Nginx 和 Tomcat 都加上以下配置。 Nginx配置123456proxy_set_header            X-Real-IP           $remote_addr;proxy_set_header            REMOT">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2017-06-26T14:32:00.000Z">
-<meta property="article:modified_time" content="2017-06-26T14:32:00.000Z">
+<meta property="article:modified_time" content="2021-01-05T09:51:34.443Z">
 <meta property="article:author" content="softgoto">
 <meta property="article:tag" content="Tomcat">
 <meta property="article:tag" content="HTTPS">
@@ -115,30 +115,25 @@
 
 
 <nav class="site-nav">
-  <ul id="menu" class="menu">
+  <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-categories">
 
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
   </ul>
@@ -188,15 +183,22 @@
         <div class="post-meta">
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
 
               <time title="创建时间：2017-06-26 14:32:00" itemprop="dateCreated datePublished" datetime="2017-06-26T14:32:00+00:00">2017-06-26</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-05 09:51:34" itemprop="dateModified" datetime="2021-01-05T09:51:34+00:00">2021-01-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
+                <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -224,14 +226,12 @@
       
         <p>问题是在 Nginx 配置完 SSL 证书之后，跑在 Tomcat 中的应用不能获取前端用户真实的 IP 和 HTTPS 头，我们需要在 Nginx 和 Tomcat 都加上以下配置。</p>
 <h3 id="Nginx配置"><a href="#Nginx配置" class="headerlink" title="Nginx配置"></a>Nginx配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">proxy_set_header            X-Real-IP           $remote_addr;</span><br><span class="line">proxy_set_header            REMOTE-HOST         $remote_addr;</span><br><span class="line">proxy_set_header            Host                $host;</span><br><span class="line">proxy_set_header            X-Forwarded-For     $proxy_add_x_forwarded_for;</span><br><span class="line">proxy_set_header            X-Forwarded-Proto   $scheme;</span><br><span class="line">proxy_pass_request_headers                      on;</span><br></pre></td></tr></table></figure>
-
 <a id="more"></a>
 
 <h3 id="Tomcat配置"><a href="#Tomcat配置" class="headerlink" title="Tomcat配置"></a>Tomcat配置</h3><p>在 <code>conf/server.xml</code> 文件中 <code>Engine</code> 节点下增加如下配置：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Valve</span></span></span><br><span class="line"><span class="tag">   <span class="attr">className</span>=<span class="string">"org.apache.catalina.valves.RemoteIpValve"</span></span></span><br><span class="line"><span class="tag">   <span class="attr">internalProxies</span>=<span class="string">"10\.0\.1\.137"</span></span></span><br><span class="line"><span class="tag">   <span class="attr">remoteIpHeader</span>=<span class="string">"X-Forwarded-For"</span></span></span><br><span class="line"><span class="tag">   <span class="attr">proxiesHeader</span>=<span class="string">"X-Forwarded-By"</span></span></span><br><span class="line"><span class="tag">   <span class="attr">protocolHeader</span>=<span class="string">"X-Forwarded-Proto"</span></span></span><br><span class="line"><span class="tag">   /&gt;</span></span><br></pre></td></tr></table></figure>
-
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;Valve</span><br><span class="line">   className=&quot;org.apache.catalina.valves.RemoteIpValve&quot;</span><br><span class="line">   internalProxies=&quot;10\.0\.1\.137&quot;</span><br><span class="line">   remoteIpHeader=&quot;X-Forwarded-For&quot;</span><br><span class="line">   proxiesHeader=&quot;X-Forwarded-By&quot;</span><br><span class="line">   protocolHeader=&quot;X-Forwarded-Proto&quot;</span><br><span class="line">   /&gt;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>Tomcat 7.0 之后的版本默认在规则匹配上只校验内网 IP ，如果 Nginx 转发到 Tomcat 是走外网方式，则需要增加 <code>internalProxies=&quot;.*&quot;</code> 属性，具体参考：<a href="http://tomcat.apache.org/tomcat-7.0-doc/api/org/apache/catalina/valves/RemoteIpValve.html" target="_blank" rel="noopener">Class RemoteIpValve</a></p>
+<p>Tomcat 7.0 之后的版本默认在规则匹配上只校验内网 IP ，如果 Nginx 转发到 Tomcat 是走外网方式，则需要增加 <code>internalProxies=&quot;.*&quot;</code> 属性，具体参考：<a target="_blank" rel="noopener" href="http://tomcat.apache.org/tomcat-7.0-doc/api/org/apache/catalina/valves/RemoteIpValve.html">Class RemoteIpValve</a></p>
 </blockquote>
 <p>Done. <span class="github-emoji" alias="coffee" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/2615.png?v8">&#x2615;</span></p>
 
@@ -240,6 +240,20 @@
     
     
     
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://softgoto.github.io/2017/06/Nginx%E8%BD%AC%E5%8F%91%E5%88%B0Tomcat%E4%B9%8B%E5%90%8E%E8%8E%B7%E5%8F%96HTTPS%E5%92%8CHOST%E7%9A%84%E9%97%AE%E9%A2%98/" title="Nginx转发到Tomcat之后获取HTTPS和HOST的问题">https://softgoto.github.io/2017/06/Nginx转发到Tomcat之后获取HTTPS和HOST的问题/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
 
       <footer class="post-footer">
           <div class="post-tags">
@@ -318,7 +332,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx配置"><span class="nav-number">1.</span> <span class="nav-text">Nginx配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tomcat配置"><span class="nav-number">2.</span> <span class="nav-text">Tomcat配置</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">Nginx配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tomcat%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">Tomcat配置</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -334,7 +348,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -347,14 +361,14 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
   <div class="links-of-author motion-element">
       <span class="links-of-author-item">
-        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+        <a href="https://github.com/softgoto" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;softgoto" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
   </div>
 
@@ -379,9 +393,9 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
-    <i class="fa fa-heart"></i>
+    <i class="fa fa-heartbeat"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">softgoto</span>
 </div>
@@ -405,6 +419,7 @@
   </div>
 
   
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
   <script src="/lib/anime.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
